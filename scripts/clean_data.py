@@ -5,6 +5,16 @@ parquet_file = "data/intermediate/yellow_tripdata_2019-01_raw.parquet"
 
 trips = pd.read_parquet(parquet_file)
 
+
+time_columns = [
+    "tpep_pickup_datetime", 
+    "tpep_dropoff_datetime", 
+    "trip_distance", 
+    "fare_amount", 
+    "trip_duration_minutes",
+    "average_speed_mph",
+]
+
 #count missing values in each column 
 missing_counts = trips.isna().sum()
 print(missing_counts)
@@ -38,13 +48,6 @@ print("Negative Duration: ", negative_duration.sum())
 print("Zero Duration: ", zero_duration.sum())
 
 
-time_columns = [
-    "tpep_pickup_datetime", 
-    "tpep_dropoff_datetime", 
-    "trip_distance", 
-    "fare_amount", 
-    "trip_duration_minutes",
-]
 
 
 
@@ -53,13 +56,9 @@ time_columns = [
 zero_time_positive_dstance = zero_duration & (trips["trip_distance"] > 0)
 
 
-
-
 #now to identify negative trip distances 
 
 negative_distance = (trips["trip_distance"] < 0)
-
-
 
 #zero distance and also positive duration. . . wtf
 
@@ -79,6 +78,20 @@ trips["flags_zero_distance_positive_duration"] = zero_distance_positive_duration
 time_passed = trips["tpep_dropoff_datetime"] - trips["tpep_pickup_datetime"]
 
 trips["trip_duration_minutes"] = time_passed.dt.total_seconds()/60
+
+
+#calculate average trip speed
+
+#speed = distance in miles ÷ time in hours
+#time is in mins so ÷ 60 initially
+
+speed_candidate = ((trips["trip_duration_minutes"] > 0) & (trips["trip_distance"] > 0))
+
+trips["average_speed_mph"] = pd.Series(pd.NA, index=trips.index, dtype="Float64")
+
+trips.loc[speed_candidate, "average_speed_mph"] = (trips.loc[speed_candidate, "trip_distance"] / (trips.loc[speed_candidate, "trip_duration_minutes"]/60))
+
+print(trips.nlargest(5, "average_speed_mph")[time_columns])
 
 
 #inspecting if the invalid trips have charges associated with them or any distance traveled
@@ -119,3 +132,17 @@ print(trips.loc[near_day, time_columns].head(5))
 
 print(trips["trip_distance"].describe())
 print(trips.nlargest(5, "trip_distance")[time_columns])
+
+
+#investigate speed thresholds
+
+for mph in [60, 80, 100]:
+    count = (trips["average_speed_mph"] > mph).sum()
+    print("Recorded Average Speed Above", mph, "mph: ", count)
+
+
+speed_review_band = ((trips["average_speed_mph"] > 80) & (trips["average_speed_mph"] <= 100))
+
+print(trips.loc[speed_review_band, time_columns].head(10))
+
+trips["flag_high_speed_review"] = (trips["average_speed_mph"] > 80 ).fillna(False)
