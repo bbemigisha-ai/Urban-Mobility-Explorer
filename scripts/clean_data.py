@@ -261,7 +261,19 @@ print("Trips missing either endpoint shape: ", missing_either_shape.sum())
 
 
 
+fare_per_mile_candidate = (trips["fare_amount"] >= 0 ) & (trips["trip_distance"] > 0) 
 
+trips["fare_per_mile"] = pd.Series(pd.NA, index=trips.index, dtype="Float64")
+
+trips.loc[fare_per_mile_candidate, "fare_per_mile"] = (
+    trips.loc[fare_per_mile_candidate, "fare_amount"] / trips.loc[fare_per_mile_candidate, "trip_distance"]
+)
+
+print(
+    trips[
+        ["fare_amount", "trip_distance", "fare_per_mile"]
+    ].head(10)
+)
 
 
 qc_summary = {
@@ -276,6 +288,9 @@ qc_summary = {
     "negative_charge_review": int(negative_charge.sum()),
     "pickup_outside_january": int(outside_january.sum()),
     "zero_time_positive_distance": int(zero_time_positive_distance.sum()),
+    "missing_fare_per_mile": int(trips["fare_per_mile"].isna().sum()),
+    "duplicate_rows": int(duplicate_count),
+
 }
 
 print(pd.Series(qc_summary))
@@ -305,6 +320,8 @@ trips["eligible_speed_map"] = (
 
 print("Eligible for speed analysis: ", trips["eligible_speed_analysis"].sum())
 print("Eligible for both-endpoint speed map: ", trips["eligible_speed_map"].sum())
+
+
 
 
 trips["flags_pickup_outside_january"] = outside_january
@@ -340,6 +357,8 @@ qc_summary["eligible_speed_analysis"] = int(trips["eligible_speed_analysis"].sum
 qc_summary["eligible_speed_map"] = int(trips["eligible_speed_map"].sum())
 qc_summary["unique_records_requiring_review"] = int(needs_review.sum())
 
+
+
 trips.to_parquet(
     "data/processed/yellow_tripdata_2019-01_enriched.parquet",
     engine="pyarrow",
@@ -347,5 +366,7 @@ trips.to_parquet(
 )
 
 pd.Series(qc_summary, name="record_count").to_csv("data/audit/qc_summary.csv", index_label="check")
+
+
 
 
