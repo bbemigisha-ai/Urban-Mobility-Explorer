@@ -28,10 +28,11 @@ What is important to note though, is that this just identifies the source record
 | passenger_count  | Recorded number of passengers | INTEGER                     |
 | trip_distance    | Recorded trip distance        | Miles; NUMERIC              |
 
-| Column                  | Calculation                                 | Unit           |
-| ----------------------- | ------------------------------------------- | -------------- |
-| `trip_duration_minutes` | Drop-off minus pickup, expressed in minutes | Minutes        |
-| `average_speed_mph`     | Distance ÷ (duration ÷ 60)                  | Miles per hour |
+| Column                  | Calculation                                 | Unit                               |
+| ----------------------- | ------------------------------------------- | ---------------------------------- |
+| `trip_duration_minutes` | Drop-off minus pickup, expressed in minutes | Minutes                            |
+| `average_speed_mph`     | Distance ÷ (duration ÷ 60)                  | Miles per hour                     |
+| `fare_per_mile`         | Base fare ÷ recorded trip distance          | USD ($) per mile; nullable NUMERIC |
 
 NB
 Speed details would be missing if distance or duration is not positive

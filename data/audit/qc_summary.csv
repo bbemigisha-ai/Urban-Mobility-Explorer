@@ -10,7 +10,9 @@ high_speed_review,6135
 negative_charge_review,7131
 pickup_outside_january,537
 zero_time_positive_distance,322
+missing_fare_per_mile,60470
+duplicate_rows,0
 missing_congestion_surcharge,4855978
 eligible_speed_analysis,7585345
-eligibles_speed_map,7414027
+eligible_speed_map,7414027
 unique_records_requiring_review,259283
