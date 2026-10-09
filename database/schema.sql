@@ -1,0 +1,47 @@
+CREATE TABLE zones (
+    location_id INTEGER PRIMARY KEY,
+    borough TEXT,
+    zone_name TEXT,
+    service_zone TEXT, 
+
+);
+
+CREATE TABLE trips (
+    vendor_id INTEGER,
+    pickup_datetime TIMESTAMP,
+    dropoff_datetime TIMESTAMP,
+    passenger_count INTEGER,
+    trip_distance NUMERIC(10, 2), 
+    rate_code_id INTEGER,
+    store_and_fwd_flag VARCHAR(1),
+    pickup_location_id INTEGER REFERENCES zones(location_id),
+    dropoff_location_id INTEGER REFERENCES zones(location_id),
+    payment_type INTEGER,
+    fare_amount NUMERIC (10, 2),
+    extra NUMERIC (10, 2),
+    mta_tax NUMERIC (10, 2),
+    tip_amount NUMERIC(10, 2),
+    tolls_amount NUMERIC (10, 2),
+    improvement_surcharge NUMERIC (10, 2), 
+    total_amount NUMERIC (10, 2), 
+    congestion_surcharge NUMERIC (10, 2),
+    source_row_number INTEGER PRIMARY KEY,
+    flag_negative_duration BOOLEAN,
+    flag_zero_duration BOOLEAN,
+    flag_zero_time_positive_distance BOOLEAN,
+    flag_zero_distance_positive_duration BOOLEAN,
+    trip_duration_minutes DOUBLE PRECISION, 
+    average_speed_mph DOUBLE PRECISION,
+    flag_long_duration_review BOOLEAN,
+    flag_high_speed_review BOOLEAN,
+    flag_negative_charge_review BOOLEAN,
+    pickup_has_shape BOOLEAN,
+    dropoff_has_shape BOOLEAN, 
+    eligible_speed_analysis BOOLEAN, 
+    eligible_speed_map BOOLEAN,
+    flag_pickup_outside_january BOOLEAN,
+    flag_missing_endpoint_shape BOOLEAN,
+    flag_negative_distance BOOLEAN,
+    source_file VARCHAR(255)
+
+);
