@@ -1,1 +1,6 @@
-data/*
+data/processed/*.parquet
+data/audit/*.parquet
+data/intermediate/*.parquet
+data/raw
+
+.DS_Store

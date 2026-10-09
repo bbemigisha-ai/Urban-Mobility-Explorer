@@ -9,6 +9,7 @@ parquet_file = "data/intermediate/yellow_tripdata_2019-01_raw.parquet"
 trips = pd.read_parquet(parquet_file)
 
 
+
 time_columns = [
     "tpep_pickup_datetime", 
     "tpep_dropoff_datetime", 
@@ -48,7 +49,7 @@ for column in ["tpep_pickup_datetime", "tpep_dropoff_datetime"]:
 
 outside_january = (
     (trips["tpep_pickup_datetime"] < pd.Timestamp("2019-01-01")) | 
-    (trips["tpep_dropoff_datetime"] >= pd.Timestamp("2019-02-01"))
+    (trips["tpep_pickup_datetime"] >= pd.Timestamp("2019-02-01"))
 )
 
 print("Pickups outside January 2019", outside_january.sum())
@@ -91,6 +92,8 @@ print("Table Size:", trips.shape)
 #count duplicate rows
 
 duplicate_count = trips.duplicated().sum()
+trips["source_row_number"] = range(len(trips))
+
 print("Duplicate Count:", duplicate_count)
 
 #check if any trip would end at or before its pickup time - to rule out invalid trips
@@ -120,7 +123,7 @@ print("Zero Duration: ", zero_duration.sum())
 
 # check if any zero duration trips have +ve distance covered
 
-zero_time_positive_dstance = zero_duration & (trips["trip_distance"] > 0)
+zero_time_positive_distance = zero_duration & (trips["trip_distance"] > 0)
 
 
 #now to identify negative trip distances 
@@ -137,7 +140,7 @@ zero_distance_positive_duration = zero_distance & positive_duration
 #flags
 trips["flags_negative_duration"] = negative_duration
 trips["flags_zero_duration"] = zero_duration
-trips["flags_zero_time_positive_distance"] = zero_time_positive_dstance
+trips["flags_zero_time_positive_distance"] = zero_time_positive_distance
 trips["flags_zero_distance_positive_duration"] = zero_distance_positive_duration
 
 
@@ -166,7 +169,7 @@ print(trips.nlargest(5, "average_speed_mph")[time_columns])
 print(trips.loc[negative_duration, time_columns])
 print(trips.loc[zero_duration, time_columns].head(5))
 
-print("Zero Time Positive Distance: ", zero_time_positive_dstance.sum())
+print("Zero Time Positive Distance: ", zero_time_positive_distance.sum())
 print("Negative Distance: ", negative_distance.sum())
 
 print("Zero Distance & Positive Duration: ", zero_distance_positive_duration.sum())
@@ -192,7 +195,7 @@ near_day = (
     (trips["trip_duration_minutes"] >= 1390) & (trips["trip_duration_minutes"] <= 1440)
 
 )
-trips["flag_long_duration_review"] = long_duration
+trips["flags_long_duration_review"] = long_duration
 
 
 print(trips.loc[near_day, time_columns].head(5))
@@ -212,7 +215,7 @@ speed_review_band = ((trips["average_speed_mph"] > 80) & (trips["average_speed_m
 
 print(trips.loc[speed_review_band, time_columns].head(10))
 
-trips["flag_high_speed_review"] = (trips["average_speed_mph"] > 80 ).fillna(False)
+trips["flags_high_speed_review"] = (trips["average_speed_mph"] > 80 ).fillna(False)
 
 #check the largest fares
 fare_columns = [
@@ -228,7 +231,7 @@ fare_columns = [
 
 print(trips.nlargest(5, "fare_amount")[fare_columns])
 
-trips["flag_negative_charge_review"] = negative_charge
+trips["flags_negative_charge_review"] = negative_charge
 
 
 
@@ -269,10 +272,75 @@ qc_summary = {
     "missing_either_shape": int (missing_either_shape.sum()),
     "negative_distance": int(negative_distance.sum()),
     "long_duration_review": int(long_duration.sum()),
-    "high_speed_review": int(trips["flag_high_speed_review"].sum()), 
+    "high_speed_review": int(trips["flags_high_speed_review"].sum()), 
     "negative_charge_review": int(negative_charge.sum()),
     "pickup_outside_january": int(outside_january.sum()),
-    "zero_time_positive_distance": int(zero_time_positive_dstance.sum()),
+    "zero_time_positive_distance": int(zero_time_positive_distance.sum()),
 }
 
 print(pd.Series(qc_summary))
+
+
+
+#
+
+trips["eligible_speed_analysis"] = (
+    (~outside_january) & 
+    (trips["trip_duration_minutes"] > 0) & 
+    (trips["trip_distance"] > 0) & 
+    (~long_duration) & 
+    (~trips["flags_high_speed_review"])
+).fillna(False)
+
+trips["eligible_speed_map"] = (
+    trips["eligible_speed_analysis"] & 
+    trips["pickup_has_shape"] & 
+    trips["dropoff_has_shape"]
+)
+
+print("Eligible for speed analysis: ", trips["eligible_speed_analysis"].sum())
+print("Eligible for both-endpoint speed map: ", trips["eligible_speed_map"].sum())
+
+
+trips["flags_pickup_outside_january"] = outside_january
+trips["flags_missing_endpoint_shape"] = missing_either_shape
+trips["flags_negative_distance"] = negative_distance
+
+review_columns = [
+    "flags_negative_duration",
+    "flags_zero_duration",
+    "flags_zero_time_positive_distance",
+    "flags_zero_distance_positive_duration",
+    "flags_long_duration_review",
+    "flags_high_speed_review",
+    "flags_negative_charge_review",
+    "flags_pickup_outside_january",
+    "flags_missing_endpoint_shape",
+    "flags_negative_distance",
+
+]
+
+needs_review = trips[review_columns].any(axis=1)
+
+trips.loc[needs_review].to_parquet(
+    "data/audit/trips_for_review.parquet",
+    engine="pyarrow",
+    index=False,
+)
+
+print("Unique records requiring review: ", needs_review.sum())
+
+qc_summary["missing_congestion_surcharge"] = int(trips["congestion_surcharge"].isna().sum())
+qc_summary["eligible_speed_analysis"] = int(trips["eligible_speed_analysis"].sum())
+qc_summary["eligible_speed_map"] = int(trips["eligible_speed_map"].sum())
+qc_summary["unique_records_requiring_review"] = int(needs_review.sum())
+
+trips.to_parquet(
+    "data/processed/yellow_tripdata_2019-01_enriched.parquet",
+    engine="pyarrow",
+    index=False
+)
+
+pd.Series(qc_summary, name="record_count").to_csv("data/audit/qc_summary.csv", index_label="check")
+
+
