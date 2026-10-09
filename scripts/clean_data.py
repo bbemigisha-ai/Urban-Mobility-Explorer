@@ -1,4 +1,7 @@
+
 import pandas as pd
+import shapefile
+#Quality Checks on the data to find discrepancies before we start cleaning
 # load parquet file
 
 parquet_file = "data/intermediate/yellow_tripdata_2019-01_raw.parquet"
@@ -14,6 +17,70 @@ time_columns = [
     "trip_duration_minutes",
     "average_speed_mph",
 ]
+
+#fares and total charges
+for column in ["fare_amount", "total_amount"]:
+    print("\nSummary: ", column)
+    print(trips[column].describe())
+    print("Negative values: ", (trips[column] < 0).sum())
+    print("Zero Values: ", (trips[column] == 0).sum())
+
+#passenger counts and category codes
+
+for column in [
+    "passenger_count",
+    "VendorID",
+    "RatecodeID",
+    "payment_type",
+    "store_and_fwd_flag",
+]:
+
+    print("\nValue Counts: ", column)
+    print(trips[column].value_counts(dropna=False))
+
+#Date coverage
+for column in ["tpep_pickup_datetime", "tpep_dropoff_datetime"]:
+    print("\nDate range: ", column)
+    print("Earliest : ", trips[column].min())
+    print("Latest : ", trips[column].max())
+
+#Use Jan as a test
+
+outside_january = (
+    (trips["tpep_pickup_datetime"] < pd.Timestamp("2019-01-01")) | 
+    (trips["tpep_dropoff_datetime"] >= pd.Timestamp("2019-02-01"))
+)
+
+print("Pickups outside January 2019", outside_january.sum())
+
+##Location
+
+zones = pd.read_csv("data/raw/taxi_zone_lookup.csv")
+print("Duplicate lookup IDs: ", zones["LocationID"].duplicated().sum())
+
+for column in ["PULocationID", "DOLocationID"]: 
+    unmatched = ~trips[column].isin(zones["LocationID"]) #~reverses results to see unmatched IDs
+    print("\nUnmatched IDs:", column)
+    print(trips.loc[unmatched, column].value_counts(dropna=False))
+
+#check for -ve charges
+
+negative_fare = trips["fare_amount"] < 0
+negative_total = trips["total_amount"] < 0
+negative_charge = negative_fare | negative_total
+
+
+print(
+    "Rows where only one amount is negative: ",
+    (negative_fare ^ negative_total).sum()
+)
+
+print(
+    trips.loc[negative_charge, "payment_type"]
+    .value_counts(dropna=False)
+)
+
+
 
 #count missing values in each column 
 missing_counts = trips.isna().sum()
@@ -146,3 +213,66 @@ speed_review_band = ((trips["average_speed_mph"] > 80) & (trips["average_speed_m
 print(trips.loc[speed_review_band, time_columns].head(10))
 
 trips["flag_high_speed_review"] = (trips["average_speed_mph"] > 80 ).fillna(False)
+
+#check the largest fares
+fare_columns = [
+    "tpep_dropoff_datetime",
+    "tpep_pickup_datetime",
+    "trip_distance",
+    "trip_duration_minutes", 
+    "RatecodeID",
+    "payment_type",
+    "fare_amount",
+    "total_amount",
+]
+
+print(trips.nlargest(5, "fare_amount")[fare_columns])
+
+trips["flag_negative_charge_review"] = negative_charge
+
+
+
+reader = shapefile.Reader("data/raw/taxi_zones/taxi_zones.shp")
+
+spatial_ids = {
+    record["LocationID"]
+    for record in reader.iterRecords()
+}
+
+for column in ["PULocationID", "DOLocationID"]: 
+    without_shape = ~trips[column].isin(spatial_ids)
+
+    print("\nTrips without shape: ", column, without_shape.sum())
+    print(trips.loc[without_shape, column].value_counts())
+
+
+trips["pickup_has_shape"] = trips["PULocationID"].isin(spatial_ids)
+trips["dropoff_has_shape"] = trips["DOLocationID"].isin(spatial_ids)
+
+#findout which trip is missing either shape
+missing_either_shape = (
+    ~trips["pickup_has_shape"] | ~trips["dropoff_has_shape"]
+)
+
+print("Trips missing either endpoint shape: ", missing_either_shape.sum())
+
+
+
+
+
+
+qc_summary = {
+    "total_rows": len(trips), 
+    "negative_duration": int(negative_duration.sum()),
+    "zero_duration": int(zero_duration.sum()),
+    "zero_distance_positive_duration": int (zero_distance_positive_duration.sum()),
+    "missing_either_shape": int (missing_either_shape.sum()),
+    "negative_distance": int(negative_distance.sum()),
+    "long_duration_review": int(long_duration.sum()),
+    "high_speed_review": int(trips["flag_high_speed_review"].sum()), 
+    "negative_charge_review": int(negative_charge.sum()),
+    "pickup_outside_january": int(outside_january.sum()),
+    "zero_time_positive_distance": int(zero_time_positive_dstance.sum()),
+}
+
+print(pd.Series(qc_summary))
