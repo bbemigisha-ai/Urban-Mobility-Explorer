@@ -281,6 +281,11 @@ qc_summary = {
 print(pd.Series(qc_summary))
 
 
+# calculate fare boundaries
+
+
+
+
 
 #
 
