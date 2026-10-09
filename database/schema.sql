@@ -2,8 +2,7 @@ CREATE TABLE zones (
     location_id INTEGER PRIMARY KEY,
     borough TEXT,
     zone_name TEXT,
-    service_zone TEXT, 
-
+    service_zone TEXT
 );
 
 CREATE TABLE trips (
