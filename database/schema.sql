@@ -12,7 +12,7 @@ CREATE TABLE trips (
     passenger_count INTEGER,
     trip_distance NUMERIC(10, 2), 
     rate_code_id INTEGER,
-    store_and_fwd_flag VARCHAR(1),
+    store_and_fwd_flag TEXT,
     pickup_location_id INTEGER REFERENCES zones(location_id),
     dropoff_location_id INTEGER REFERENCES zones(location_id),
     payment_type INTEGER,
@@ -24,7 +24,7 @@ CREATE TABLE trips (
     improvement_surcharge NUMERIC (10, 2), 
     total_amount NUMERIC (10, 2), 
     congestion_surcharge NUMERIC (10, 2),
-    source_row_number INTEGER PRIMARY KEY,
+    source_row_number BIGINT PRIMARY KEY,
     flag_negative_duration BOOLEAN,
     flag_zero_duration BOOLEAN,
     flag_zero_time_positive_distance BOOLEAN,
@@ -42,6 +42,6 @@ CREATE TABLE trips (
     flag_pickup_outside_january BOOLEAN,
     flag_missing_endpoint_shape BOOLEAN,
     flag_negative_distance BOOLEAN,
-    source_file VARCHAR(255)
+    source_file TEXT
 
 );
