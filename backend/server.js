@@ -1,7 +1,7 @@
 import express from "express"
-import { error } from "node:console";
-import path from "node:path"
 import { fileURLToPath } from "node:url";
+import pool from "./db.js";
+import { readFile } from "node:fs/promises";
 
 
 const app = express();
@@ -10,6 +10,12 @@ const port = process.env.PORT || 3000;
 //process.env.port allows for a configurable port in case 3000 is occupied
 //to configure port on terminal => "PORT=3001 npm start"
 
+
+// load sql
+
+const summaryQuery = await readFile(
+    new URL("../database/zone_hour_summary.sql", import.meta.url), "utf-8"
+)
 
 
 const zonesFile = fileURLToPath(
@@ -21,7 +27,7 @@ function healthHandler(req, res){
 }
 
 app.get("/api/health", healthHandler);
-app.get("/api/zones/summary", function (req, res){
+app.get("/api/zones/summary", async function (req, res){ //async allows handler to use await for database requests
     const pickupHour = req.query.pickup_hour;    
 
     if (
@@ -34,43 +40,40 @@ app.get("/api/zones/summary", function (req, res){
     }
     const hour = Number(pickupHour);
     
+    try {
+        const result = await pool.query(summaryQuery, [hour]);
+
+        const zones = result.rows.map(function (row){ // produce new array by transforming each row
+        return{
+            ...row, //copies existing fields
+            pickup_count: Number(row.pickup_count),
+            eligible_speed_count: Number(row.eligible_speed_count), 
+            mean_trip_speed_mph:
+                row.mean_trip_speed_mph === null
+                ? null
+                :Number(row.mean_trip_speed_mph)
+        };
+    
+    });
+
     res.json({
         metadata: {
             dataset: "yellow_tripdata_2019-01",
             pickup_hour: hour, 
-            data_mode: "fixture"
+            data_mode: "database_sample"
         },
-        zones: [ //test values
-            {
-                location_id: 1, 
-                zone_name: "Newark Airport", 
-                borough: "EWR", 
-                pickup_count: 120, 
-                eligible_speed_count: 100,
-                mean_trip_speed_mph: 18.5, 
-                
-            }, 
-            {
-                location_id: 2, 
-                zone_name: "Jamaica Bay", 
-                borough: "Queens", 
-                pickup_count: 0, 
-                eligible_speed_count: 0,
-                mean_trip_speed_mph: null, 
-
-            },
-            {
-                location_id: 3, 
-                zone_name: "Allerton/Pelham Gardens", 
-                borough: "Bronx", 
-                pickup_count: 15, 
-                eligible_speed_count: 0,
-                mean_trip_speed_mph: null,
-            }
-        ]
+        zones: zones
     });
+} catch (error){
+    console.error("Zone summary query failed: ", error.message);
 
+    res.status(500).json({
+        error: "Unable to load zone summaries"
+    });
+}
 });
+
+
 
 app.get("/data/taxi_zones.geojson", function (req,res){
     res.sendFile(zonesFile); //send existing file as result
@@ -83,7 +86,20 @@ app.use("/api", function (req,res){
     });
 });
 
-app.listen(port, function(){
-    console.log("Server running at http://localhost: " + port)
+const server = app.listen(port, function (){
+    console.log("Server running at http://localhost: " + port);
 });
 
+process.on ("SIGINT", function (){
+    console.log("Shutting down. . . ");
+
+    server.close(async function () {
+        try{
+            await pool.end();
+            console.log("Server and database pool closed.");
+        } catch (error){
+            console.error("Shutdown failed: ", error.message);
+            process.exitCode = 1;
+        }
+    });
+});

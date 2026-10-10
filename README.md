@@ -69,3 +69,90 @@ road routes are unavailable.
 
 The dataset also lacks stable vehicle identifiers, so it cannot directly
 measure individual taxis' empty travel between passengers.
+
+## Running the backend locally
+
+The backend uses Node.js, Express, and PostgreSQL. It currently queries
+a 10,000-trip development sample, not the full January dataset.
+
+### 1. Install dependencies
+
+From the project root:
+
+    cd backend
+    npm ci
+
+### 2. Configure local settings
+
+Copy `.env.example` to `.env` inside `backend/` and update:
+
+    PORT=3000
+    PGHOST=localhost
+    PGPORT=5432
+    PGDATABASE=urban_mobility
+    PGUSER=your_local_postgres_user
+
+Set `PGPASSWORD` if your PostgreSQL configuration requires one.
+Keep `.env` out of Git. The start command loads it automatically.
+
+### 3. Prepare the database
+
+Ensure PostgreSQL is running. From the project root, create the database:
+
+    createdb urban_mobility
+
+Run the schema on the new, empty database:
+
+    psql -d urban_mobility -v ON_ERROR_STOP=1 --single-transaction -f database/schema.sql
+
+Open PostgreSQL from the project root:
+
+    psql -d urban_mobility
+
+Import zones first, then the sample. Run each command on one line:
+
+    \copy zones(location_id, borough, zone_name, service_zone) FROM 'data/processed/zones.csv' WITH (FORMAT csv, HEADER true, NULL '\N');
+
+    \copy trips FROM 'data/processed/trips_sample.csv' WITH (FORMAT csv, HEADER true, NULL '\N');
+
+The trips import relies on the schema matching the CSV column order.
+Expected counts are 265 zones and 10,000 trips. Do not repeat the imports
+against already-populated tables.
+
+Validate the import:
+
+    \i database/validate.sql
+
+Exit PostgreSQL with `\q`.
+
+### 4. Start the server
+
+From `backend/`:
+
+    npm start
+
+The default port is 3000; `.env` can override it.
+
+| Endpoint                           | Purpose                                                |
+| ---------------------------------- | ------------------------------------------------------ |
+| `/api/health`                      | Server health response                                 |
+| `/api/zones/summary?pickup_hour=0` | January pickup counts and eligible mean speeds by zone |
+| `/data/taxi_zones.geojson`         | 260 unique zone boundaries for Leaflet                 |
+
+Open endpoints at `http://localhost:3000`, or use your configured port.
+
+### Behavior and verification
+
+- The pickup hour must be an integer from 0 to 23.
+- Invalid hours return HTTP 400.
+- Unknown API routes return HTTP 404.
+- Database query failures return HTTP 500.
+- Unavailable mean speeds remain JSON `null`.
+- Responses are labelled `database_sample`.
+- Control+C closes the HTTP server and database connection pool.
+
+A direct SQL comparison for East Village (location ID 79), pickup hour 0,
+matched the API: 469 pickups, 464 eligible trips, and approximately
+10.7649 mph mean recorded speed.
+
+These values describe the development sample and are not full-month findings.
