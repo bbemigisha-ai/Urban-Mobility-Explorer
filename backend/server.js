@@ -60,7 +60,7 @@ app.get("/api/zones/summary", async function (req, res){ //async allows handler 
         metadata: {
             dataset: "yellow_tripdata_2019-01",
             pickup_hour: hour, 
-            data_mode: "database_sample"
+            data_mode: "database_full"
         },
         zones: zones
     });
