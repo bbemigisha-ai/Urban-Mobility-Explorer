@@ -24,7 +24,7 @@ CREATE TABLE trips (
     improvement_surcharge NUMERIC (10, 2), 
     total_amount NUMERIC (10, 2), 
     congestion_surcharge NUMERIC (10, 2),
-    source_row_number BIGINT PRIMARY KEY,
+    source_row_number BIGINT NOT NULL,
     flag_negative_duration BOOLEAN,
     flag_zero_duration BOOLEAN,
     flag_zero_time_positive_distance BOOLEAN,
@@ -42,6 +42,7 @@ CREATE TABLE trips (
     flag_pickup_outside_january BOOLEAN,
     flag_missing_endpoint_shape BOOLEAN,
     flag_negative_distance BOOLEAN,
-    source_file TEXT PRIMARY KEY
+    source_file TEXT NOT NULL,
+    PRIMARY KEY (source_file, source_row_number)
 
 );
