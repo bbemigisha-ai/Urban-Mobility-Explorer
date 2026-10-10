@@ -5,3 +5,7 @@ data/raw
 data/processed/trips_full.csv
 .DS_Store
 notes.md
+
+node_modules/
+.env
+.env.local 
