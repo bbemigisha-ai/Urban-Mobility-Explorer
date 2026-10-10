@@ -37,6 +37,8 @@ What is important to note though, is that this just identifies the source record
 NB
 Speed details would be missing if distance or duration is not positive
 Flags have been put in place for control during analysis
+Fare per mile is only missing when the distance is not positive or when the fare is negative. It also doesn't include tips or additional charges.
+This doesn't fully check for outliers, so would require further review
 
 ## Money
 

@@ -74,7 +74,6 @@ app.get("/api/zones/summary", async function (req, res){ //async allows handler 
 });
 
 
-
 app.get("/data/taxi_zones.geojson", function (req,res){
     res.sendFile(zonesFile); //send existing file as result
 });
