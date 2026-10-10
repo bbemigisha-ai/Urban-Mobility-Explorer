@@ -1,5 +1,5 @@
 --change this number when you want to change your target hour.
-\set target_hour 1
+\set target_hour 8
 SELECT 
     z.location_id AS zone_id,
     z.zone_name,
