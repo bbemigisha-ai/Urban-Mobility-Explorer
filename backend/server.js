@@ -1,7 +1,13 @@
 import express from "express"
+import path from "node:path"
+import { fileURLToPath } from "node:url";
+
 
 const app = express();
 const port = 3000;
+const zonesFile = fileURLToPath(
+    new URL("../data/processed/taxi_zones.geojson", import.meta.url)
+)
 
 function healthHandler(req, res){
     res.json({status: "ok"});
@@ -49,6 +55,10 @@ app.get("/api/zones/summary", function (req, res){
         ]
     });
 
+});
+
+app.get("/data/taxi_zones.geojson", function (req,res){
+    res.sendFile(zonesFile); //send existing file as result
 });
 
 app.listen(port, function(){
