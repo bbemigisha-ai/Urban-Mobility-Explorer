@@ -36,12 +36,12 @@ CREATE TABLE trips (
     flag_negative_charge_review BOOLEAN,
     pickup_has_shape BOOLEAN,
     dropoff_has_shape BOOLEAN,
-    fare_per_mile NUMERIC(10, 2), 
+    fare_per_mile NUMERIC, 
     eligible_speed_analysis BOOLEAN, 
     eligible_speed_map BOOLEAN,
     flag_pickup_outside_january BOOLEAN,
     flag_missing_endpoint_shape BOOLEAN,
     flag_negative_distance BOOLEAN,
-    source_file TEXT
+    source_file TEXT PRIMARY KEY
 
 );
