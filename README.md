@@ -4,53 +4,44 @@ Where do NYC taxi trips begin, how quickly do they move, and how does that chang
 
 Urban Mobility Explorer is a student-built dashboard that turns **January 2019 NYC yellow taxi records** into an interactive map of urban movement.
 
-## What we're building
+## What's been built
 
-Our Leaflet dashboard will let users select a pickup hour and explore:
+- A Python pipeline processing **7.67 million taxi trip records**, with typed Parquet storage, QC flags, audit outputs and DB exports.
+- 3 derived featuers: trip duration, average recorded speed & base fare per mile.
+- PostgreSQL DB with related trips and zones tables.
+- An Express API returning hourly summaries and manually sorted top-ten pickup zones.
+- GeoJSON containing **260 unique taxi-zone boundaries**, converted to longitude and latitude and checked for proper valid geometry.
+- Frontend layout with a Leaflet map, zone boundaries and clickale zone names.
 
-- **Taxi activity:** pickup counts across NYC taxi zones.
-- **Recorded trip speeds:** average speeds calculated from trips that pass our quality checks.
-- **Zone details:** names, boroughs, and summaries displayed on the map.
+## Architecture
 
-The goal is to make patterns in taxi activity and movement easier to explore.
-
-## From raw records to an interactive map
-
+```text
 NYC taxi CSV → Python processing → Parquet and CSV exports
 → PostgreSQL → Node.js API → Leaflet dashboard
+```
 
-Our processing pipeline preserves suspicious records with review flags,
-rather than silently discarding them. Derived features include trip
-duration, average recorded speed, and base fare per mile.
+API summaries and geo features are matched using `location_id`
 
-## Built so far
+## Team and Tech
 
-- Processed **7.67 million taxi trip records**.
-- Created quality flags, analysis eligibility rules, and audit outputs.
-- Prepared database imports and a **10,000-trip development sample**.
-- Exported **260 unique taxi zone boundaries** as GeoJSON.
-- Documented the data fields and database handoff.
-
-The database, API, and interactive dashboard are the next milestones.
-
-## Technology
-
-| Layer                 | Technology                    |
-| --------------------- | ----------------------------- |
-| Data processing       | Python, pandas, PyArrow       |
-| Geographic processing | GeoPandas                     |
-| Database              | PostgreSQL — planned          |
-| Backend               | Node.js and Express — planned |
-| Interactive map       | Leaflet — planned             |
-
-## Meet Group Zero
-
-| Member   | Responsibility                                   |
-| -------- | ------------------------------------------------ |
-| Nadiv    | Data processing and backend                      |
-| Karyna   | Database design and implementation               |
-| Bertha   | Frontend and interactive map                     |
+| Member   | Responsibility                                   | Layer                 | Technology              |
+| -------- | ------------------------------------------------ | --------------------- | ----------------------- |
+| Nadiv    | Data processing and backend                      | Data processing       | Python, pandas, PyArrow |
+|          |                                                  | Geographic Processing | GeoPandas               |
+| Karyna   | Database design and implementation               | Database              | PostgreSQL              |
+| Bertha   | Frontend and interactive map                     | Frontend              | HTML, CSS, JS, Leaflet  |
 | Everyone | Documentation, testing, and project coordination |
+
+## Repo Structure
+
+```text
+backend/    API, DB connection, ranking algorithm, and checks
+database/   Schema, imports, validation, and summary queries
+frontend/   Dashboard layout, styles, and map interaction
+scripts/    Python processing and export scripts
+docs/       Data dicts and documentation
+data/       Local datasets, exports and audit outpouts
+```
 
 ## Working with the data
 
@@ -69,6 +60,35 @@ road routes are unavailable.
 
 The dataset also lacks stable vehicle identifiers, so it cannot directly
 measure individual taxis' empty travel between passengers.
+
+## Prepare the data
+
+Large CSV and Parquet files are excluded from Git and shared separately.
+The pipeline expects the trip CSV, zone lookup, and shapefile components
+under `data/raw/`.
+
+Install processing dependencies:
+
+```bash
+python3 -m pip install pandas pyarrow pyshp geopandas pyproj
+```
+
+Run from the project root:
+
+```bash
+python3 scripts/convert_to_parquet.py
+python3 scripts/clean_data.py
+python3 scripts/export_database_data.py
+python3 scripts/export_zones_geojson.py
+```
+
+The exports include `trips_sample.csv`, `trips_full.csv`, `zones.csv`,
+and `taxi_zones.geojson` under `data/processed/`. The sample contains the
+first 10,000 records and is not representative of the full month.
+
+## Set up PostgreSQL
+
+With PostgreSQL running, execute from the project root:
 
 ## Running the backend locally
 
@@ -156,3 +176,40 @@ matched the API: 469 pickups, 464 eligible trips, and approximately
 10.7649 mph mean recorded speed.
 
 These values describe the development sample and are not full-month findings.
+
+## Ranking algorithm
+
+A manually implemented **insertion sort** ranks zone summaries by
+pickup count. It preserves equal-count order and sorts a copy so the
+original map response remains unchanged.
+
+Best-case time is O(n); average/worst-case time is O(n²). Sorting uses
+O(1) temporary space, while the copied array requires O(n) space.
+The algorithm processes 265 summaries, not individual trips.
+
+From `backend/`, run:
+
+```bash
+node check_ranking.js
+node --env-file=.env check_db.js
+```
+
+## Validation and limitations
+
+The full import matched the expected **7,585,345 speed-eligible records**
+and **4,855,978 missing congestion surcharges**. East Village at hour 8
+matched direct SQL results: **5,992 pickups, 5,943 eligible trips, and
+approximately 10.7353 mph**. A subsequent local API request took about
+1.13 seconds; the initial request took about 43 seconds.
+
+Records are retained with QC flags. Speed eligibility requires
+positive distance and duration, a January pickup, duration at most
+180 minutes, and speed at most 80 mph. These thresholds are provisional.
+Extreme positive financial values require further review.
+
+There are 265 lookup zones but only 260 mapped IDs. Recorded speeds
+indicate movement rather than directly measured congestion. Actual
+routes and stable vehicle IDs are unavailable, so empty taxi mileage
+cannot be reconstructed directly.
+
+See `docs/data_dictionary.md` for field definitions.
