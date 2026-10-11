@@ -23,7 +23,6 @@ zones = zones[["LocationID", "geometry"]].dissolve(
 print ("Unique zone features: ", len(zones))
 print("Repeated IDs: ", zones["LocationID"].duplicated().sum())
 
-
 #match labels from zones.csv so that the map and database can use the same names
 
 zones_lookup = pd.read_csv(

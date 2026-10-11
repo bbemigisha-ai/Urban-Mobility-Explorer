@@ -1,4 +1,5 @@
-import express from "express"
+import cors from "cors";
+import express from "express";
 import { fileURLToPath } from "node:url";
 import pool from "./db.js";
 import { readFile } from "node:fs/promises";
@@ -7,6 +8,8 @@ import { rankZonesByPickups } from "./rank_zones.js";
 
 const app = express();
 const port = process.env.PORT || 3000; 
+
+
 
 //process.env.port allows for a configurable port in case 3000 is occupied
 //to configure port on terminal => "PORT=3001 npm start"
@@ -24,6 +27,10 @@ const zonesFile = fileURLToPath(
 function healthHandler(req, res){
     res.json({status: "ok"});
 }
+
+app.use(cors({
+    origin: "http://127.0.0.1:5500"
+}));
 
 app.get("/api/health", healthHandler);
 
