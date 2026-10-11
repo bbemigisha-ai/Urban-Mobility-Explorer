@@ -45,9 +45,9 @@ print(zones[["location_id", "zone_name", "borough"]].head())
 
 # check geometry before exporting
 
-# print("Missing geometry: ", zones.geometry.isna().sum())
-# print("Empty geometry: ", zones.geometry.is_empty.sum())
-# print("Invalid geometry: ", (~zones.geometry.is_valid).sum())
+print("Missing geometry: ", zones.geometry.isna().sum())
+print("Empty geometry: ", zones.geometry.is_empty.sum())
+print("Invalid geometry: ", (~zones.geometry.is_valid).sum())
 
 
 zones.to_file("data/processed/taxi_zones.geojson", driver="GeoJSON", index=False)
