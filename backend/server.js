@@ -11,12 +11,11 @@ const port = process.env.PORT || 3000;
 //to configure port on terminal => "PORT=3001 npm start"
 
 
-// load sql
+// load sql 
 
 const summaryQuery = await readFile(
     new URL("../database/zone_hour_summary.sql", import.meta.url), "utf-8"
 )
-
 
 const zonesFile = fileURLToPath(
     new URL("../data/processed/taxi_zones.geojson", import.meta.url)
