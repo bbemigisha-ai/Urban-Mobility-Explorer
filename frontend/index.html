@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group0 Urban Mobility Explorer</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <span class="taxi-icon"></span>
+            <span >Group0 New York Explorer</span>
+        </div>
+
+        <nav>
+            <a href="index.html">Dashboard</a>
+            <a href="#insights">Insights</a>
+            <a href="#about">About</a>
+        </nav>
+
+        <div class="search-box">
+            <input type="text"
+            id="searchinput"
+            placeholder="Explore New York City Taxi Stats">
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-image">
+                <div class="hero-overlay">
+                    <p class="hero-small">PEOPLE.PLACES.MOVEMENT</p>
+                    <h1>New York City <span>Explorer</span></h1>
+                    <p>Exploring how NYC taxi movement changes <br> across time and location</p>
+                </div>
+            </div>
+           
+            <div class="dashboard-area">
+                <aside class="filters">
+                    <h2>Explore The Data</h2>
+
+                    <label for="hourFilter">Pickup Hour</label>
+
+                    <select id="hourFilter">
+                        <option value="all">All Hours</option>
+                        <option value="0">12 AM</option>
+                        <option value="1">1 AM</option>
+                        <option value="2">2 AM</option>
+                        <option value="3">3 AM</option>
+                        <option value="4">4 AM</option>
+                        <option value="5">5 AM</option>
+                        <option value="6">6 AM</option>
+                        <option value="7">7 AM</option>
+                        <option value="8">8 AM</option>
+                        <option value="9">9 AM</option>
+                        <option value="10">10 AM</option>
+                        <option value="11">11 AM</option>
+                        <option value="12">12 PM</option>
+                        <option value="13">1 PM</option>
+                        <option value="14">2 PM</option>
+                        <option value="15">3 PM</option>
+                        <option value="16">4 PM</option>
+                        <option value="17">5 PM</option>
+                        <option value="18">6 PM</option>
+                        <option value="19">7 PM</option>
+                        <option value="20">8 PM</option>
+                        <option value="21">9 PM</option>
+                        <option value="22">10 PM</option>
+                        <option value="23">11 PM</option>
+                    </select>
+
+                    <label for="boroughFilter">Borough</label>
+
+                    <select id="boroughFilter">
+                        <option value="all">All Boroughs</option>
+                        <option value="Manhattan">Manhattan</option>
+                        <option value="Brooklyn">Brooklyn</option>
+                        <option value="Queens">Queens</option>
+                        <option value="Bronx">Bronx</option>
+                        <option value="Staten Island">Staten Island</option>
+                    </select>
+
+                    <label for="metricFilter">Map Metric</label>
+
+                    <select id="metricFilter">
+                        <option value="pickups">Taxi Activity(Pickups)</option>
+                        <option value="speed">Average Speed</option>
+                        <option value="fare">Average Fare</option>
+                    </select>
+
+                    <button id="resetFilters" class="reset-button">Reset</button>
+
+                </aside>
+
+                <section class="dashboard-content">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <span class="kpi-icon">
+
+                            </span>
+
+                            <div>
+                                <p>Total Pickups</p>
+                                <h3 id="totalPickups">__</h3>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <span class="kpi-icon speed"></span>
+
+                            <div>
+                                <p>Average Speed</p>
+                                <h3 id="averageSpeed">__</h3>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <span class="kpi-icon distance"></span>
+
+                            <div>
+                                <p>Average Distance</p>
+                                <h3 id="averageDistance">__</h3>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <span class="kpi-icon fare">$</span>
+
+                            <div>
+                                <p>Average Fare</p>
+                                <h3 id="averageFare">__</h3>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="map-section">
+                        <div class="map-card">
+                            <div class="section-heading">
+                                <div>
+                                    <h2> NYC Taxi Zone Activity</h2>
+                                    <p>Taxi pickups across the city's zones</p>
+                                </div>
+                            </div>
+
+                            <div id="map"></div>
+                        </div>
+
+                        <div class="zone-card">
+                            <h3>Selected Zone</h3>
+                            <div id="zoneDetails">
+                                <h2>Select a zone</h2>
+                                <p class="zone-placeholder">Click a taxi zone on the map to explore its activity</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visual-section">
+                        <div class="chart-card">
+                            <h2>Taxi Activity Throughout the Day</h2>
+                            <p> Total pickups across all zones</p>
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+
+                        <div class="ranking-card">
+                            <div class="ranking-header">
+                                <div>
+                                    <h2>Top 5 Taxi Zones</h2>
+                                    <p>Zones with most pickups</p>
+                                </div>
+
+                                <select id="sortFilter">
+                                    <option value="asc">Lowest</option>
+                                </select>
+                            </div>
+
+                            <div id="zoneRanking">
+                                <p class="loading">Loading Zone data ... </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section id="insights" class="page-section">
+            <div class="section-title">
+                <p>WHAT THE DATA TELLS US</p>
+                <h2>Key Insights</h2>
+            </div>
+
+            <div class="insight-grid">
+                <div class="insight-card">
+                    <h3>Busiest Hours</h3>
+
+                    <p id="busiestHours">Exploring taxi activity throughout the day.</p>
+                </div>
+
+                <div class="insight-card">
+                    <h3>Busiest Borough</h3>
+
+                    <p id="busiestBorough">Comparing activity across NYC boroughs.</p>
+                </div>
+
+                <div class="insight-card">
+                    <h3>Speed Patterns</h3>
+
+                    <p id="speedInsight">Comparing recorded taxi speeds.</p>
+                </div>
+
+                <div class="insight-card">
+                    <h3>Fare Patterns</h3>
+
+                    <p id="fareInsight">Exploring distance and fare relationships.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="page-section about-section">
+            <div class="section-title">
+                <p>ABOUT THE PROJECT</p>
+                <h2>About Urban Mobility Explorer</h2>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3>Project Purpose
+                    </h3>
+
+                    <p>Urban Mobility Explorer uses NVY taxi trip data to explore how taxi activity, speed, distance and fares change across different times and locations. </p>
+
+                </div>
+
+                <div class="about-card">
+                    <h3>The Dataset</h3>
+
+                    <p>
+                        The project uses January 2019 NYC Yellow Taxi records containing information about locations, times, distances, fares and recorded speeds.
+                    </p>
+                </div>
+
+                <div class="about-card">
+                    <h3>Technologies</h3>
+
+                    <p>HTML · CSS · JavaScript · Leaflet · Chart.js · Node.js · PostgreSQL</p>
+                </div>
+
+                <div class="about-card">
+                    <h3>Key Limitation</h3>
+
+                    <p>Recorded taxi speed is an indicator of movement rather than a direct measurement of street congestion</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="js/api.js"></script>
+
+    <script src="js/app.js"></script>
+
+    <script src="js/map.js"></script>
+</body>
+</html>
