@@ -6,9 +6,8 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(taxiMap);
 
 let mapzoneData = [];
-
 getZoneSummary("all")
-    .then(data => {
+    .then(data => {   
         mapzoneData = data.zones;
 
         console.log("Map zone data:", mapzoneData);
@@ -125,7 +124,6 @@ fetch("assets/taxi_zones.geojson")
             }
 
         }).addTo(taxiMap);
-
     })
     .catch(error => {
         console.error("Could not load taxi zones:", error);
