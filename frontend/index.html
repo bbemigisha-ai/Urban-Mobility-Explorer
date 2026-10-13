@@ -99,6 +99,8 @@
                 </aside>
 
                 <section class="dashboard-content">
+                    <p id="dashboardStatus" role="status" aria-live="polite"></p>
+                    
                     <div class="kpi-grid">
                         <div class="kpi-card">
                             <span class="kpi-icon">
@@ -150,9 +152,11 @@
                             <div class="section-heading">
                                 <div>
                                     <h2> NYC Taxi Zone Activity</h2>
-                                    <p>Taxi pickups across the city's zones</p>
+                                    <p id="mapDescription">Taxi pickups across the city's zones</p>
                                 </div>
                             </div>
+
+                            <p id="mapStatus" role="status"></p>
 
                             <div id="map"></div>
                             <div id="mapLegend" class="map-legend" aria-live="polite"></div>
@@ -169,16 +173,16 @@
 
                     <div class="visual-section">
                         <div class="chart-card">
-                            <h2>Taxi Activity Throughout the Day</h2>
-                            <p> Total pickups across all zones</p>
+                            <h2 id="chartTitle">Taxi Activity Throughout the Day</h2>
+                            <p id="chartDescription">Pickups across matching zones</p>
                             <canvas id="hourlyChart"></canvas>
                         </div>
 
                         <div class="ranking-card">
                             <div class="ranking-header">
                                 <div>
-                                    <h2>Top 5 Taxi Zones</h2>
-                                    <p>Zones with most pickups</p>
+                                    <h2 id="rankingTitle">Top 5 Taxi Zones</h2>
+                                    <p id="rankingDescription">Matching zones with most pickups</p>
                                 </div>
 
                                 <select id="sortFilter">
@@ -204,7 +208,7 @@
 
             <div class="insight-grid">
                 <div class="insight-card">
-                    <h3>Busiest Hours</h3>
+                    <h3>Hourly Activity</h3>
 
                     <p id="busiestHours">Exploring taxi activity throughout the day.</p>
                 </div>

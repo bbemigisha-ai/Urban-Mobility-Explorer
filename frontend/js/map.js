@@ -33,6 +33,22 @@ function displaySelectedZone(zoneId, zoneName, borough) {
             return String(zone.location_id) === String(zoneId);
         });
 
+        if (!matchingZones.length){
+            const message  = 
+                dashboardState === "loading"
+                    ? "Loading statistics for this zone..."
+                    : dashboardState === "error"
+                        ? "Zone statistics are currently unavailable"
+                        : "This zone is outside the current search or borough filters.";
+
+            zoneDetails.innerHTML = `
+                <h2>${zoneName}</h2>
+                <p>${borough}</p>
+                <p>${message}</p>
+            `;
+            return;
+        }
+
         const pickupCount = matchingZones.reduce(
             (total, zone) =>
                 total + Number(zone.pickup_count || 0),
@@ -59,7 +75,13 @@ function displaySelectedZone(zoneId, zoneName, borough) {
 
 
 fetch("assets/taxi_zones.geojson")
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Unable to load zone boundaries");
+        }
+
+        return response.json();
+    })
     .then(data => {
 
         console.log("GeoJSON loaded:", data);
@@ -135,4 +157,5 @@ fetch("assets/taxi_zones.geojson")
     })
     .catch(error => {
         console.error("Could not load taxi zones:", error);
+        document.getElementById("mapStatus").textContent = "Map boundaries could not load. Refresh page to retry."
     });

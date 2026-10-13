@@ -1,4 +1,6 @@
-let zoneData = []
+let zoneData = [];
+let latestRequestId = 0;
+let dashboardState = "loading";
 let hourlyChart = null;
 
 const hourFilter = document.getElementById("hourFilter");
@@ -9,21 +11,38 @@ const searchInput = document.getElementById("searchinput");
 const sortFilter = document.getElementById("sortFilter");
 
 async function loadDashboard() {
+
+    const requestId = ++latestRequestId;
+    const selectedHour = hourFilter.value;
+    const status = document.getElementById("dashboardStatus");
+
+    dashboardState = "loading";
+    status.textContent = "Loading taxi data . . . ";
+
+    zoneData = [];
+    updateDashboard(zoneData);
+
     try {
-        const selectedHour = hourFilter.value;
-
-        console.log("Loading dashboard data...");
-
         const data = await getZoneSummary(selectedHour);
 
-        console.log("API data:", data);
+        if (requestId !== latestRequestId){
+            return;
+        }
 
         zoneData = data.zones;
-
+        dashboardState = "ready";
         updateDashboard(zoneData);
 
     } catch (error) {
-        console.error("Dashboard loading error:", error);
+        if (requestId !== latestRequestId){
+            return;
+        }
+        dashboardState = "error";
+        zoneData = [];
+        updateDashboard(zoneData);
+
+        status.textContent = "Could not load taxi data. Might want to check the backend, then use Reset to retry.";
+        console.error("Dashboard loading error: ", error);
     }
 }
 
@@ -45,6 +64,12 @@ function updateDashboard(data) {
         (zone.zone_name || "").toLowerCase().includes(searchTerm)
         );
     }
+
+    if (dashboardState === "ready") {
+        document.getElementById("dashboardStatus").textContent = filteredData.length
+            ? ""
+            : "no zones match your filters";
+    }
     
     updateMapData(filteredData);
     updateKPIs(filteredData);
@@ -57,7 +82,23 @@ function updateInsights(data) {
     const busiestHours = document.getElementById("busiestHours");
 
     if (!data.length) {
-        busiestHours.textContent = "No data available";
+        const message = dashboardState === "loading"
+            ? "Loading data..."
+            : dashboardState === "error"
+                ? "Data unavailable."
+                : "No matching zones.";
+
+        for (const id of [
+            "busiestHours", 
+            "busiestBorough", 
+            "speedInsight",
+            "fareInsight"
+        ]) {
+            document.getElementById(id).textContent = message;
+        }
+
+    
+
         return;
     }
 
@@ -87,8 +128,18 @@ function updateInsights(data) {
             hour: "numeric"
         });
 
-    busiestHours.textContent =
-        `${formattedHour} with ${Number(busiestHour[1]).toLocaleString()} pickups`;
+         const hourPickups = Number(busiestHour[1]);
+
+        if (hourPickups === 0){
+            busiestHours.textContent = "No pickups recorded for the current filters";
+        } else {
+            const prefix = 
+                hourFilter.value === "all" ? "Busiest hour" : "Selected hour";
+
+            busiestHours.textContent = 
+                `${prefix}: ${formattedHour} with ${hourPickups.toLocaleString()} pickups`;
+        }
+
 
     const busiestBorough = document.getElementById("busiestBorough");
     const boroughTotals = {};
@@ -103,12 +154,12 @@ function updateInsights(data) {
     const topBorough = Object.entries(boroughTotals)
     .sort((a, b) => b[1] - a[1])[0];
     
-    if (topBorough) {
+    if (topBorough && Number(topBorough[1]) > 0) {
         busiestBorough.textContent =
         `${topBorough[0]} with ${Number(topBorough[1]).toLocaleString()} pickups`;
     
     } else {
-        busiestBorough.textContent = "No data available";
+        busiestBorough.textContent = "No pickups recorded for the current filters";
     }
 
     const speedInsight = document.getElementById("speedInsight");
@@ -124,7 +175,7 @@ function updateInsights(data) {
 
     fareInsight.textContent = averageFare === null
         ? "No fare data available"
-        : `Average base fare trip is $${averageFare.toFixed(2)}`;
+        : `Average base fare per trip is $${averageFare.toFixed(2)}`;
 }
 
 function calculateMeanSpeed(data){
@@ -198,6 +249,20 @@ function calculateMeanFare(data){
 
 
 function updateKPIs(data) {
+
+    if (!data.length){
+        for (const id of [
+            "totalPickups", 
+            "averageSpeed",
+            "averageDistance",
+            "averageFare"
+        ]){
+            document.getElementById(id).textContent = "-";
+        }
+        return;
+    }
+
+
     const totalPickups = data.reduce((total, zone) =>{
         return total + Number(zone.pickup_count || 0);
     }, 0);
@@ -255,6 +320,22 @@ function updateRanking(data) {
     const rankingContainer = document.getElementById("zoneRanking");
 
     const sortDirection = sortFilter.value;
+
+    const highestFirst = sortDirection === "desc";
+
+    document.getElementById("rankingTitle").textContent = highestFirst ? "Top 5 Taxi Zones" : "Lowest 5 Taxi Zones";
+
+    document.getElementById("rankingDescription").textContent = highestFirst ? "Matching zones with the most pickups" : "Matching zones with the fewest pickups";
+
+    if (!data.length){
+        rankingContainer.textContent = 
+        dashboardState === "loading" ? "Loading zones. . . "
+            :dashboardState === "error" 
+                ? "Zone data unavailable"
+                : "No matching zone";
+        return;
+
+    }
     
     const sortedZones = aggregateZones(data)
     .sort((a, b) => {
@@ -312,6 +393,25 @@ function updateHourlyChart(data) {
         "8 PM", "9 PM", "10 PM", "11 PM"
     ];
 
+    const allHours = hourFilter.value === "all";
+    const selectedHour = Number(hourFilter.value);
+
+    const chartLabels = allHours
+        ? labels
+        : [labels[selectedHour]];
+
+
+    const chartValues = !data.length
+        ? chartLabels.map(() => null)
+        : allHours
+            ? hourlyTotals
+            : [hourlyTotals[selectedHour]];
+
+    document.getElementById("chartTitle").textContent = allHours ? "Taxi Activity Throughout the Day" : `Taxi Activity at ${labels[selectedHour]}`;
+
+    document.getElementById("chartDescription").textContent = !data.length ? "No chart data to display" : "Pickup totals across matching zones; times are NYC local time";
+
+
     const canvas = document.getElementById("hourlyChart");
 
     if (hourlyChart) {
@@ -319,15 +419,15 @@ function updateHourlyChart(data) {
     }
 
     hourlyChart = new Chart(canvas, {
-        type: "line",
+        type: allHours ? "line" : "bar",
 
         data: {
-            labels: labels,
+            labels: chartLabels,
 
             datasets: [{
                 label: "Taxi Pickups",
 
-                data: hourlyTotals,
+                data: chartValues,
 
                 borderWidth: 3,
 
@@ -442,6 +542,14 @@ function updateMapLegend(metric){
 
 function updateMapMetric(metric) {
     updateMapLegend(metric);
+
+    const descriptions = {
+        pickups: "Pickup counts across matching taxi zones", 
+        speed: "Weighted average recorded speed by zone (mph)",
+        fare: "Weighted average base fare per trip by zone (USD)"
+    };
+
+    document.getElementById("mapDescription").textContent = descriptions[metric];
 
     if (!window.taxiZoneLayer) {
         return;
