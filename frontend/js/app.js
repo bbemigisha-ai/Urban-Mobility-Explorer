@@ -112,19 +112,11 @@ function updateInsights(data) {
         : `Average recorded speed is ${averageSpeed.toFixed(1)} mph`;
 
     const fareInsight = document.getElementById("fareInsight");
-    const fares = data
-    .map(zone => Number(zone.base_fare_per_mile))
-    .filter(fare => !isNaN(fare) && fare > 0);
-    
-    if (fares.length) {
-        const averageFare =
-        fares.reduce((a, b) => a + b, 0) / fares.length;
-        
-        fareInsight.textContent =
-        `Average base fare per mile is $${averageFare.toFixed(2)}`;
-    } else {
-        fareInsight.textContent = "No fare data available";
-    }
+    const averageFare = calculateMeanFare(data);
+
+    fareInsight.textContent = averageFare === null
+        ? "No fare data available"
+        : `Average base fare trip is $${averageFare.toFixed(2)}`;
 }
 
 function calculateMeanSpeed(data){
@@ -149,6 +141,54 @@ function calculateMeanSpeed(data){
 
 }
 
+function calculateMeanFare(data){
+    let weightedFareTotal = 0
+    let eligibleFareTotal = 0
+
+
+    for (const zone of data){
+        const fare  = zone.mean_base_fare;
+        const count = Number(zone.eligible_fare_count);
+
+        if (fare !== null && Number.isFinite(Number(fare)) && count > 0){
+            weightedFareTotal += Number(fare) * count;
+            eligibleFareTotal += count;
+        }
+    }
+
+    if (eligibleFareTotal > 0){
+        return weightedFareTotal / eligibleFareTotal
+    } else {
+        return null
+    }
+
+}
+
+
+ function calculateMeanDistance(data){
+    let weightedDistanceTotal = 0
+    let eligibleDistanceTotal = 0
+
+    for (const zone of data){
+        const distance  = zone.mean_trip_distance;
+        const count = Number(zone.eligible_distance_count);
+
+        if (distance !== null && Number.isFinite(Number(distance)) && count > 0){
+            weightedDistanceTotal += Number(distance) * count;
+            eligibleDistanceTotal += count;
+        }
+    }
+
+    if (eligibleDistanceTotal > 0){
+        return weightedDistanceTotal / eligibleDistanceTotal
+    } else {
+        return null
+    }
+    
+ }
+
+
+
 function updateKPIs(data) {
     const totalPickups = data.reduce((total, zone) =>{
         return total + Number(zone.pickup_count || 0);
@@ -164,9 +204,18 @@ function updateKPIs(data) {
         ? "-"
         :`${averageSpeed.toFixed(1)} mph`;
 
-    document.getElementById("averageDistance").textContent = "—";
+    const averageDistance = calculateMeanDistance(data);
+    document.getElementById("averageDistance").textContent = 
+        averageDistance === null
+        ? "-"
+        : `${averageDistance.toFixed(2)} miles`;
      
-    document.getElementById("averageFare").textContent = "—";   
+    const averageFare = calculateMeanFare(data);
+
+    document.getElementById("averageFare").textContent = 
+        averageFare === null
+        ? "-"
+        :`$${averageFare.toFixed(2)} `;
 }
 
 function aggregateZones(data){
@@ -317,6 +366,14 @@ function getSpeedColor(speed){
     return "#225ea8";
 }
 
+function getFareColor(fare){
+    if (fare === null) return "#737373";
+    if (fare < 10) return "#eff3ff";
+    if (fare < 15) return "#bdd7e7";
+    if (fare < 20) return "#6baed6";
+    return "#2171b5";
+}
+
 function updateMapMetric(metric) {
     if (!window.taxiZoneLayer) {
         return;
@@ -344,6 +401,9 @@ function updateMapMetric(metric) {
         if (metric === "speed"){
             value = calculateMeanSpeed(matchingZones)
         }
+        if (metric === "fare"){
+            value = calculateMeanFare(matchingZones);
+        }
 
         if (metric === "pickups"){
             layer.setStyle({
@@ -357,12 +417,19 @@ function updateMapMetric(metric) {
                 fillColor: getSpeedColor(value),
                 fillOpacity: matchingZones.length && value !== null ? 0.65 : 0.15
             });
+        } else if (metric === "fare"){
+            layer.setStyle({
+                fillColor: getFareColor(value),
+                fillOpacity:
+                    matchingZones.length && value !== null ? 0.65 : 0.15
+            });
         } else {
             layer.setStyle({
                 fillColor: "#737373",
                 fillOpacity: 0.15
             });
         }
+
     });
 }
 hourFilter.addEventListener("change", loadDashboard);
