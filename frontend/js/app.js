@@ -37,6 +37,14 @@ function updateDashboard(data) {
             zone.borough === selectedBorough
         );
     }
+
+    const searchTerm = searchInput.value.toLowerCase().trim();
+
+    if (searchTerm) {
+        filteredData = filteredData.filter(zone =>
+        (zone.zone_name || "").toLowerCase().includes(searchTerm)
+        );
+    }
     
     updateMapData(filteredData);
     updateKPIs(filteredData);
@@ -507,22 +515,19 @@ resetFilters.addEventListener("click", function() {
     hourFilter.value = "all";
     boroughFilter.value = "all";
     metricFilter.value = "pickups";
+    searchInput.value = "";
+    sortFilter.value = "desc";
 
     loadDashboard();
 });
 
 searchInput.addEventListener("input", function() {
-    const searchTerm = searchInput.value.toLowerCase().trim();
-
-    const filteredData = zoneData.filter(zone =>
-        (zone.zone_name || "").toLowerCase().includes(searchTerm)
-    );
-
-    updateDashboard(filteredData);
+    updateDashboard(zoneData);
 });
 
 sortFilter.addEventListener("change", function() {
-    updateRanking(zoneData);
+    updateDashboard(zoneData);
 });
+
 
 loadDashboard();
