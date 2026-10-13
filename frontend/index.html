@@ -21,11 +21,6 @@
             <a href="#about">About</a>
         </nav>
 
-        <div class="search-box">
-            <input type="text"
-            id="searchinput"
-            placeholder="Explore New York City Taxi Stats">
-        </div>
     </header>
 
     <main>
@@ -41,6 +36,14 @@
             <div class="dashboard-area">
                 <aside class="filters">
                     <h2>Explore The Data</h2>
+
+                    <div class="zone-search">
+                        <label for="searchinput">Search zones</label>
+                        <input
+                            type="search"
+                            id="searchinput"
+                            placeholder="e.g. East Village">
+                    </div>
 
                     <label for="hourFilter">Pickup Hour</label>
 
@@ -88,7 +91,7 @@
                     <select id="metricFilter">
                         <option value="pickups">Taxi Activity(Pickups)</option>
                         <option value="speed">Average Speed</option>
-                        <option value="fare">Average Fare</option>
+                        <option value="fare">Average Base Fare</option>
                     </select>
 
                     <button id="resetFilters" class="reset-button">Reset</button>
@@ -96,6 +99,8 @@
                 </aside>
 
                 <section class="dashboard-content">
+                    <p id="dashboardStatus" role="status" aria-live="polite"></p>
+                    
                     <div class="kpi-grid">
                         <div class="kpi-card">
                             <span class="kpi-icon">
@@ -135,7 +140,7 @@
                             <span class="kpi-icon fare">$</span>
 
                             <div>
-                                <p>Average Fare</p>
+                                <p>Average Base Fare</p>
                                 <h3 id="averageFare">__</h3>
                             </div>
                         </div>
@@ -147,11 +152,14 @@
                             <div class="section-heading">
                                 <div>
                                     <h2> NYC Taxi Zone Activity</h2>
-                                    <p>Taxi pickups across the city's zones</p>
+                                    <p id="mapDescription">Taxi pickups across the city's zones</p>
                                 </div>
                             </div>
 
+                            <p id="mapStatus" role="status"></p>
+
                             <div id="map"></div>
+                            <div id="mapLegend" class="map-legend" aria-live="polite"></div>
                         </div>
 
                         <div class="zone-card">
@@ -165,20 +173,20 @@
 
                     <div class="visual-section">
                         <div class="chart-card">
-                            <h2>Taxi Activity Throughout the Day</h2>
-                            <p> Total pickups across all zones</p>
+                            <h2 id="chartTitle">Taxi Activity Throughout the Day</h2>
+                            <p id="chartDescription">Pickups across matching zones</p>
                             <canvas id="hourlyChart"></canvas>
                         </div>
 
                         <div class="ranking-card">
                             <div class="ranking-header">
                                 <div>
-                                    <h2>Top 5 Taxi Zones</h2>
-                                    <p>Zones with most pickups</p>
+                                    <h2 id="rankingTitle">Top 5 Taxi Zones</h2>
+                                    <p id="rankingDescription">Matching zones with most pickups</p>
                                 </div>
 
                                 <select id="sortFilter">
-                                    <option value="asc">Highest</option>
+                                    <option value="desc">Highest</option>
                                     <option value="asc">Lowest</option>
                                 </select>
                             </div>
@@ -200,7 +208,7 @@
 
             <div class="insight-grid">
                 <div class="insight-card">
-                    <h3>Busiest Hours</h3>
+                    <h3>Hourly Activity</h3>
 
                     <p id="busiestHours">Exploring taxi activity throughout the day.</p>
                 </div>
@@ -288,10 +296,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script src="js/api.js"></script>
+    
+    <script src="js/map.js"></script>
 
     <script src="js/app.js"></script>
 
-    <script src="js/map.js"></script>
 </body>
 
 </html>
