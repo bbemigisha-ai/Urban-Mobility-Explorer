@@ -37,7 +37,8 @@ function updateDashboard(data) {
             zone.borough === selectedBorough
         );
     }
-
+    
+    updateMapData(filteredData);
     updateKPIs(filteredData);
     updateRanking(filteredData);
     updateHourlyChart(filteredData);
@@ -103,21 +104,12 @@ function updateInsights(data) {
     }
 
     const speedInsight = document.getElementById("speedInsight");
-    const speeds = data
-    .map(zone => Number(zone.mean_trip_speed_mph))
-    .filter(speed => !isNaN(speed) && speed > 0);
-    
-    if (speeds.length) {
-        const averageSpeed =
-        
-        speeds.reduce((a, b) => a + b, 0) / speeds.length;
-        
-        speedInsight.textContent =
-        
-        `Average recorded speed is ${averageSpeed.toFixed(1)} mph`;
-    } else {
-        speedInsight.textContent = "No speed data available";
-    }
+
+    const averageSpeed = calculateMeanSpeed(data);
+
+    speedInsight.textContent = averageSpeed === null
+        ? "No Speed data available"
+        : `Average recorded speed is ${averageSpeed.toFixed(1)} mph`;
 
     const fareInsight = document.getElementById("fareInsight");
     const fares = data
@@ -135,6 +127,28 @@ function updateInsights(data) {
     }
 }
 
+function calculateMeanSpeed(data){
+    let weightedSpeedTotal = 0
+    let eligibleTripTotal = 0
+
+    for (const zone of data){
+        const speed = zone.mean_trip_speed_mph;
+        const count = Number(zone.eligible_speed_count);
+
+        if (speed !== null && Number.isFinite(Number(speed)) && count > 0){
+            weightedSpeedTotal += Number(speed) * count;
+            eligibleTripTotal += count;
+        }
+    }
+
+    if (eligibleTripTotal > 0){
+        return weightedSpeedTotal / eligibleTripTotal
+    } else {
+        return null
+    }
+
+}
+
 function updateKPIs(data) {
     const totalPickups = data.reduce((total, zone) =>{
         return total + Number(zone.pickup_count || 0);
@@ -143,20 +157,41 @@ function updateKPIs(data) {
     document.getElementById("totalPickups").textContent =
         totalPickups.toLocaleString();
 
-    const speeds = data 
-        .map(zone => Number(zone.mean_trip_speed_mph))
-        .filter(speed => !isNaN(speed) && speed > 0);
-
-    const averageSpeed = speeds.length
-        ?speeds.reduce((a,b) => a + b, 0) / speeds.length
-        : 0;
+    const averageSpeed = calculateMeanSpeed(data);
 
     document.getElementById("averageSpeed").textContent =
-        `${averageSpeed.toFixed(1)} mph`;
+        averageSpeed === null
+        ? "-"
+        :`${averageSpeed.toFixed(1)} mph`;
 
     document.getElementById("averageDistance").textContent = "—";
      
     document.getElementById("averageFare").textContent = "—";   
+}
+
+function aggregateZones(data){
+    const zonesById = new Map();
+
+    for (const zone of data) {
+        const zoneId = zone.location_id;
+
+
+        // prevent later hours from resetting an existing zone's total
+        if (!zonesById.has(zoneId)) {
+            zonesById.set(zoneId, {
+                location_id: zoneId,
+                zone_name: zone.zone_name,
+                borough: zone.borough,
+                pickup_count: 0
+            });
+        }
+        
+        // add each hourly record pickup to zone's total
+        const combinedZone = zonesById.get(zoneId);
+        combinedZone.pickup_count += Number(zone.pickup_count || 0)
+    }
+
+    return Array.from(zonesById.values());
 }
 
 function updateRanking(data) {
@@ -164,7 +199,7 @@ function updateRanking(data) {
 
     const sortDirection = sortFilter.value;
     
-    const sortedZones = [...data]
+    const sortedZones = aggregateZones(data)
     .sort((a, b) => {
         const pickupA = Number(a.pickup_count || 0);
         const pickupB = Number(b.pickup_count || 0);
@@ -263,6 +298,16 @@ function updateHourlyChart(data) {
     });
 }
 
+
+function getPickupColor(count) {
+    if (count === 0) return "#737373";
+    if (count < 1000) return "#ffffb2";
+    if (count < 10000) return "#fecc5c";
+    if (count < 50000) return "#fd8d3c";
+
+    return "#e31a1c";
+}
+
 function updateMapMetric(metric) {
     if (!window.taxiZoneLayer) {
         return;
@@ -272,26 +317,40 @@ function updateMapMetric(metric) {
 
         const zone = layer.feature.properties;
 
+        const zoneId = 
+            zone.LocationID ||
+            zone.location_id ||
+            zone.zone_id;
+
+        const matchingZones = mapzoneData.filter(record => String(record.location_id) === String(zoneId));
+
         let value = 0;
 
         if (metric === "pickups") {
-            value = Number(zone.pickup_count || 0);
+            value = matchingZones.reduce((total, record) => total + Number(record.pickup_count || 0),
+            0
+        );
+    }
+
+        if (metric === "speed"){
+            value = calculateMeanSpeed(matchingZones)
         }
 
-        if (metric === "speed") {
-            value = Number(zone.mean_trip_speed_mph || 0);
+        if (metric === "pickups"){
+            layer.setStyle({
+                fillColor: matchingZones.length
+                ? getPickupColor(value)
+                : "#737373",
+            fillOpacity: matchingZones.length ? 0.65 : 0.15
+            });
+        } else {
+            layer.setStyle({
+                fillColor: "#f4c430",
+                fillOpacity: value > 0 ? 0.45 : 0.15
+            });
         }
-
-        if (metric === "fare") {
-            value = Number(zone.base_fare_per_mile || 0);
-        }
-
-        layer.setStyle({
-            fillOpacity: value > 0 ? 0.45 : 0.15
-        });
     });
 }
-
 hourFilter.addEventListener("change", loadDashboard);
 
 metricFilter.addEventListener("change", function() {
