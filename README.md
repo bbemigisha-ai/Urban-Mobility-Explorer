@@ -1,4 +1,4 @@
-# Urban Mobility Explorer 🚕🗽
+# Urban Mobility Explorer 
 
 Where do NYC taxi trips begin, how quickly do they move, and how does that change throughout the day?
 
