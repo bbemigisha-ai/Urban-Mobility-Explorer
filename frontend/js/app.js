@@ -308,6 +308,15 @@ function getPickupColor(count) {
     return "#e31a1c";
 }
 
+function getSpeedColor(speed){
+    if (speed === null) return "#737373";
+    if (speed < 10) return "#ffffcc";
+    if (speed < 15) return "#a1dab4";
+    if (speed < 20) return "#41b6c4";
+
+    return "#225ea8";
+}
+
 function updateMapMetric(metric) {
     if (!window.taxiZoneLayer) {
         return;
@@ -343,10 +352,15 @@ function updateMapMetric(metric) {
                 : "#737373",
             fillOpacity: matchingZones.length ? 0.65 : 0.15
             });
+        } else if (metric === "speed"){
+            layer.setStyle({
+                fillColor: getSpeedColor(value),
+                fillOpacity: matchingZones.length && value !== null ? 0.65 : 0.15
+            });
         } else {
             layer.setStyle({
-                fillColor: "#f4c430",
-                fillOpacity: value > 0 ? 0.45 : 0.15
+                fillColor: "#737373",
+                fillOpacity: 0.15
             });
         }
     });
