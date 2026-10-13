@@ -374,10 +374,71 @@ function getFareColor(fare){
     return "#2171b5";
 }
 
+
+function updateMapLegend(metric){
+    const legend = document.getElementById("mapLegend");
+
+    const legends = {
+        pickups: {
+            title: "Pickup count", 
+            items: [
+                [getPickupColor(0), "0"],
+                [getPickupColor(1), "1-999"],
+                [getPickupColor(1000), "1,000-9,999"],
+                [getPickupColor(10000), "10,000-49,999"],
+                [getPickupColor(50000), "50,000+"]
+            ]
+        },
+
+        speed: {
+            title: "Average recorded speed (mph)",
+            items:[
+            [getSpeedColor(null), "No eligible speed data"],
+            [getSpeedColor(0), "Below 10"],
+            [getSpeedColor(10), "10 to below 15"],
+            [getSpeedColor(15), "15 to below 20"],
+            [getSpeedColor(20), "20+"]
+        ]
+
+        },
+
+        fare: {
+            title: "Average base fare per trip ($)", 
+            items: [
+                [getFareColor(null), "No eligible fare data"],
+                [getFareColor(0), "Below $10"],
+                [getFareColor(10), "$10 to below $15"],
+                [getFareColor(15), "$15 to below $20"],
+                [getFareColor(20), "$20+"]
+            ]
+        }
+    }   
+    const selectedLegend = legends[metric];
+
+    legend.innerHTML = `
+        <strong>${selectedLegend.title}</strong>
+        <div class="legend-items">
+            ${selectedLegend.items.map(([color, label]) =>`
+                <span class="legend-item">
+                    <span class="legend-swatch" style="background-color: ${color};"
+                    aria-hidden="true">
+                    </span>
+                    <span>${label}</span>
+                </span>
+            `).join("")}
+        </div>
+        <p>Faint zones are outside the current filters or lack eligible data.</p>    
+
+    `;
+}
+
 function updateMapMetric(metric) {
+    updateMapLegend(metric);
+
     if (!window.taxiZoneLayer) {
         return;
     }
+
 
     window.taxiZoneLayer.eachLayer(layer => {
 

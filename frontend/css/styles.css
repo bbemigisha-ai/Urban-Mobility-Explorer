@@ -705,3 +705,36 @@ hero-overlay{
 .footer-bottom p {
     font-size: 0.85rem;
 }
+
+
+.map-legend {
+    margin-top: 16px;
+    font-size: 0.875rem;
+}
+
+.legend-items{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    margin-top: 10px;
+}
+
+.legend-item{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-swatch{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    border: 1px solid #888;
+    border-radius: 3px;
+}
+
+.map-legend p {
+    margin-top: 10px;
+    font-size: 0.8 rem;
+}
