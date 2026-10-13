@@ -1,0 +1,774 @@
+{
+  "today": {
+    "date": "2026-10-13",
+    "totalEvents": 766,
+    "totalAISuggestions": 101,
+    "totalAILines": 1823,
+    "totalManualLines": 660,
+    "aiPercentage": 73.4192509061619,
+    "averageReviewTime": 0,
+    "sessionCount": 0,
+    "toolBreakdown": {
+      "copilot": {
+        "tool": "copilot",
+        "suggestionCount": 0,
+        "acceptedCount": 0,
+        "rejectedCount": 0,
+        "linesGenerated": 0,
+        "averageReviewTime": 0
+      },
+      "cursor": {
+        "tool": "cursor",
+        "suggestionCount": 0,
+        "acceptedCount": 0,
+        "rejectedCount": 0,
+        "linesGenerated": 0,
+        "averageReviewTime": 0
+      },
+      "claude-code": {
+        "tool": "claude-code",
+        "suggestionCount": 101,
+        "acceptedCount": 6,
+        "rejectedCount": 0,
+        "linesGenerated": 5760,
+        "averageReviewTime": 0
+      }
+    },
+    "reviewQualityScore": 45,
+    "unreviewedLines": 1463,
+    "unreviewedPercentage": 35,
+    "averageFileReviewTime": 0,
+    "reviewedFilesCount": 7
+  },
+  "yesterday": {
+    "date": "2026-10-12",
+    "totalEvents": 11,
+    "totalAISuggestions": 5,
+    "totalAILines": 0,
+    "totalManualLines": 6,
+    "aiPercentage": 0,
+    "averageReviewTime": 0,
+    "sessionCount": 0,
+    "toolBreakdown": {
+      "copilot": {
+        "tool": "copilot",
+        "suggestionCount": 0,
+        "acceptedCount": 0,
+        "rejectedCount": 0,
+        "linesGenerated": 0,
+        "averageReviewTime": 0
+      },
+      "cursor": {
+        "tool": "cursor",
+        "suggestionCount": 0,
+        "acceptedCount": 0,
+        "rejectedCount": 0,
+        "linesGenerated": 0,
+        "averageReviewTime": 0
+      },
+      "claude-code": {
+        "tool": "claude-code",
+        "suggestionCount": 5,
+        "acceptedCount": 0,
+        "rejectedCount": 0,
+        "linesGenerated": 33,
+        "averageReviewTime": 0
+      }
+    },
+    "reviewQualityScore": 31,
+    "unreviewedLines": 0,
+    "unreviewedPercentage": 0,
+    "agentSessionCount": 0,
+    "averageFileReviewTime": 0,
+    "reviewedFilesCount": 17
+  },
+  "last7Days": [
+    {
+      "date": "2026-10-07",
+      "totalEvents": 0,
+      "totalAISuggestions": 0,
+      "totalAILines": 0,
+      "totalManualLines": 0,
+      "aiPercentage": 0,
+      "averageReviewTime": 0,
+      "sessionCount": 0,
+      "toolBreakdown": {}
+    },
+    {
+      "date": "2026-10-08",
+      "totalEvents": 353,
+      "totalAISuggestions": 27,
+      "totalAILines": 324,
+      "totalManualLines": 346,
+      "aiPercentage": 48.35820895522388,
+      "averageReviewTime": 0,
+      "sessionCount": 0,
+      "toolBreakdown": {
+        "copilot": {
+          "tool": "copilot",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "cursor": {
+          "tool": "cursor",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "claude-code": {
+          "tool": "claude-code",
+          "suggestionCount": 27,
+          "acceptedCount": 4,
+          "rejectedCount": 0,
+          "linesGenerated": 991,
+          "averageReviewTime": 0
+        }
+      },
+      "reviewQualityScore": 100,
+      "unreviewedLines": 0,
+      "unreviewedPercentage": 0,
+      "agentSessionCount": 0,
+      "averageFileReviewTime": 1053912,
+      "reviewedFilesCount": 5
+    },
+    {
+      "date": "2026-10-09",
+      "totalEvents": 714,
+      "totalAISuggestions": 70,
+      "totalAILines": 319,
+      "totalManualLines": 672,
+      "aiPercentage": 32.18970736629667,
+      "averageReviewTime": 0,
+      "sessionCount": 0,
+      "toolBreakdown": {
+        "copilot": {
+          "tool": "copilot",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "cursor": {
+          "tool": "cursor",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "claude-code": {
+          "tool": "claude-code",
+          "suggestionCount": 70,
+          "acceptedCount": 9,
+          "rejectedCount": 0,
+          "linesGenerated": 3205,
+          "averageReviewTime": 0
+        }
+      },
+      "reviewQualityScore": 89,
+      "unreviewedLines": 0,
+      "unreviewedPercentage": 0,
+      "agentSessionCount": 0,
+      "averageFileReviewTime": 0,
+      "reviewedFilesCount": 9
+    },
+    {
+      "date": "2026-10-10",
+      "totalEvents": 488,
+      "totalAISuggestions": 40,
+      "totalAILines": 53,
+      "totalManualLines": 463,
+      "aiPercentage": 10.271317829457365,
+      "averageReviewTime": 0,
+      "sessionCount": 0,
+      "toolBreakdown": {
+        "copilot": {
+          "tool": "copilot",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "cursor": {
+          "tool": "cursor",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "claude-code": {
+          "tool": "claude-code",
+          "suggestionCount": 40,
+          "acceptedCount": 4,
+          "rejectedCount": 0,
+          "linesGenerated": 1197,
+          "averageReviewTime": 0
+        }
+      },
+      "reviewQualityScore": 63,
+      "unreviewedLines": 0,
+      "unreviewedPercentage": 0,
+      "agentSessionCount": 0,
+      "averageFileReviewTime": 0,
+      "reviewedFilesCount": 14
+    },
+    {
+      "date": "2026-10-11",
+      "totalEvents": 296,
+      "totalAISuggestions": 31,
+      "totalAILines": 197,
+      "totalManualLines": 290,
+      "aiPercentage": 40.4517453798768,
+      "averageReviewTime": 0,
+      "sessionCount": 0,
+      "toolBreakdown": {
+        "copilot": {
+          "tool": "copilot",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "cursor": {
+          "tool": "cursor",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "claude-code": {
+          "tool": "claude-code",
+          "suggestionCount": 31,
+          "acceptedCount": 1,
+          "rejectedCount": 0,
+          "linesGenerated": 1918,
+          "averageReviewTime": 0
+        }
+      },
+      "reviewQualityScore": 51,
+      "unreviewedLines": 0,
+      "unreviewedPercentage": 0,
+      "agentSessionCount": 0,
+      "averageFileReviewTime": 0,
+      "reviewedFilesCount": 17
+    },
+    {
+      "date": "2026-10-12",
+      "totalEvents": 11,
+      "totalAISuggestions": 5,
+      "totalAILines": 0,
+      "totalManualLines": 6,
+      "aiPercentage": 0,
+      "averageReviewTime": 0,
+      "sessionCount": 0,
+      "toolBreakdown": {
+        "copilot": {
+          "tool": "copilot",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "cursor": {
+          "tool": "cursor",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "claude-code": {
+          "tool": "claude-code",
+          "suggestionCount": 5,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 33,
+          "averageReviewTime": 0
+        }
+      },
+      "reviewQualityScore": 31,
+      "unreviewedLines": 0,
+      "unreviewedPercentage": 0,
+      "agentSessionCount": 0,
+      "averageFileReviewTime": 0,
+      "reviewedFilesCount": 17
+    },
+    {
+      "date": "2026-10-13",
+      "totalEvents": 766,
+      "totalAISuggestions": 101,
+      "totalAILines": 1823,
+      "totalManualLines": 660,
+      "aiPercentage": 73.4192509061619,
+      "averageReviewTime": 0,
+      "sessionCount": 0,
+      "toolBreakdown": {
+        "copilot": {
+          "tool": "copilot",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "cursor": {
+          "tool": "cursor",
+          "suggestionCount": 0,
+          "acceptedCount": 0,
+          "rejectedCount": 0,
+          "linesGenerated": 0,
+          "averageReviewTime": 0
+        },
+        "claude-code": {
+          "tool": "claude-code",
+          "suggestionCount": 101,
+          "acceptedCount": 6,
+          "rejectedCount": 0,
+          "linesGenerated": 5760,
+          "averageReviewTime": 0
+        }
+      },
+      "reviewQualityScore": 45,
+      "unreviewedLines": 1463,
+      "unreviewedPercentage": 35,
+      "agentSessionCount": 0,
+      "averageFileReviewTime": 0,
+      "reviewedFilesCount": 7
+    }
+  ],
+  "trends": {
+    "aiPercentage": "increasing",
+    "reviewTime": "stable"
+  },
+  "toolBreakdown": [
+    {
+      "tool": "copilot",
+      "suggestionCount": 0,
+      "acceptedCount": 0,
+      "rejectedCount": 0,
+      "linesGenerated": 0,
+      "averageReviewTime": 0
+    },
+    {
+      "tool": "cursor",
+      "suggestionCount": 0,
+      "acceptedCount": 0,
+      "rejectedCount": 0,
+      "linesGenerated": 0,
+      "averageReviewTime": 0
+    },
+    {
+      "tool": "claude-code",
+      "suggestionCount": 101,
+      "acceptedCount": 6,
+      "rejectedCount": 0,
+      "linesGenerated": 5760,
+      "averageReviewTime": 0
+    }
+  ],
+  "codingModes": {
+    "agent": {
+      "lines": 5746,
+      "events": 95,
+      "reviewedFiles": 6,
+      "totalFiles": 11,
+      "avgReviewScore": 54.54545454545455,
+      "percentage": 100
+    },
+    "inline": {
+      "lines": 14,
+      "events": 6,
+      "acceptances": 6,
+      "quickAcceptances": 6,
+      "percentage": 0
+    },
+    "chatPaste": {
+      "lines": 0,
+      "events": 0,
+      "avgReviewScore": 0,
+      "percentage": 0
+    },
+    "totalLines": 5760
+  },
+  "threshold": {
+    "level": "junior",
+    "blindApprovalTime": 5000,
+    "maxAIPercentage": 40,
+    "minReviewTime": 5000,
+    "streakThreshold": 3
+  },
+  "config": {
+    "experienceLevel": "junior",
+    "blindApprovalThreshold": 2000,
+    "alertFrequency": "medium",
+    "enableGamification": false,
+    "anonymizePaths": true,
+    "trackedTools": {
+      "copilot": true,
+      "cursor": true,
+      "claudeCode": true
+    },
+    "excludedGlobs": [],
+    "onboardingCompleted": false,
+    "customThresholds": {
+      "aiPercentageMax": 40,
+      "reviewTimeMin": 5000
+    }
+  },
+  "snoozeState": {
+    "snoozed": false
+  },
+  "streakDays": 0,
+  "unreviewedFiles": [
+    {
+      "filePath": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer/frontend/js/api.js",
+      "date": "2026-10-13",
+      "tool": "ai",
+      "reviewQuality": "none",
+      "reviewScore": 0,
+      "isReviewed": false,
+      "linesGenerated": 2,
+      "linesChanged": 2,
+      "linesSinceReview": 2,
+      "linesAdded": 2,
+      "linesRemoved": 0,
+      "charactersCount": 2704,
+      "agentSessionId": "manual-session",
+      "isAgentGenerated": true,
+      "wasFileOpen": false,
+      "firstGeneratedAt": 1791873965943,
+      "totalReviewTime": 272080,
+      "language": "javascript",
+      "modificationCount": 2,
+      "totalTimeInFocus": 272080,
+      "scrollEventCount": 0,
+      "cursorMovementCount": 0,
+      "editsMade": false,
+      "lastOpenedAt": 1791873965943,
+      "reviewSessionsCount": 0,
+      "reviewedInTerminal": false
+    },
+    {
+      "filePath": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer/README.md",
+      "date": "2026-10-13",
+      "tool": "ai",
+      "reviewQuality": "thorough",
+      "reviewScore": 100,
+      "isReviewed": false,
+      "linesGenerated": 1148,
+      "linesChanged": 1824,
+      "linesSinceReview": 1461,
+      "linesAdded": 785,
+      "linesRemoved": 676,
+      "charactersCount": 65240,
+      "agentSessionId": "agent-session-1791918746806-cofl0x2z6",
+      "isAgentGenerated": true,
+      "wasFileOpen": false,
+      "firstGeneratedAt": 1791872401400,
+      "totalReviewTime": 90094,
+      "language": "markdown",
+      "modificationCount": 12,
+      "totalTimeInFocus": 867414,
+      "scrollEventCount": 1,
+      "cursorMovementCount": 0,
+      "editsMade": false,
+      "lastOpenedAt": 1791918744226,
+      "reviewSessionsCount": 0,
+      "reviewedInTerminal": false
+    },
+    {
+      "filePath": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer/backend/check_ranking.js",
+      "date": "2026-10-13",
+      "tool": "ai",
+      "reviewQuality": "none",
+      "reviewScore": 0,
+      "isReviewed": false,
+      "linesGenerated": 92,
+      "linesChanged": 92,
+      "linesSinceReview": 0,
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "charactersCount": 0,
+      "agentSessionId": "manual-session",
+      "isAgentGenerated": true,
+      "wasFileOpen": false,
+      "firstGeneratedAt": 1791819948035,
+      "totalReviewTime": 0,
+      "modificationCount": 0,
+      "totalTimeInFocus": 0,
+      "scrollEventCount": 0,
+      "cursorMovementCount": 0,
+      "editsMade": false,
+      "reviewSessionsCount": 0,
+      "reviewedInTerminal": false
+    },
+    {
+      "filePath": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer/notes.md",
+      "date": "2026-10-13",
+      "tool": "ai",
+      "reviewQuality": "none",
+      "reviewScore": 0,
+      "isReviewed": false,
+      "linesGenerated": 20,
+      "linesChanged": 20,
+      "linesSinceReview": 0,
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "charactersCount": 0,
+      "agentSessionId": "manual-session",
+      "isAgentGenerated": true,
+      "wasFileOpen": false,
+      "firstGeneratedAt": 1791819948035,
+      "totalReviewTime": 0,
+      "modificationCount": 0,
+      "totalTimeInFocus": 0,
+      "scrollEventCount": 0,
+      "cursorMovementCount": 0,
+      "editsMade": false,
+      "reviewSessionsCount": 0,
+      "reviewedInTerminal": false
+    },
+    {
+      "filePath": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer/inspect_zones.py",
+      "date": "2026-10-13",
+      "tool": "ai",
+      "reviewQuality": "none",
+      "reviewScore": 0,
+      "isReviewed": false,
+      "linesGenerated": 14,
+      "linesChanged": 14,
+      "linesSinceReview": 0,
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "charactersCount": 0,
+      "agentSessionId": "manual-session",
+      "isAgentGenerated": true,
+      "wasFileOpen": false,
+      "firstGeneratedAt": 1791819948035,
+      "totalReviewTime": 0,
+      "modificationCount": 0,
+      "totalTimeInFocus": 0,
+      "scrollEventCount": 0,
+      "cursorMovementCount": 0,
+      "editsMade": false,
+      "reviewSessionsCount": 0,
+      "reviewedInTerminal": false
+    },
+    {
+      "filePath": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer/data/raw/scripts/inspect_data.py",
+      "date": "2026-10-13",
+      "tool": "ai",
+      "reviewQuality": "none",
+      "reviewScore": 0,
+      "isReviewed": false,
+      "linesGenerated": 10,
+      "linesChanged": 10,
+      "linesSinceReview": 0,
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "charactersCount": 0,
+      "agentSessionId": "manual-session",
+      "isAgentGenerated": true,
+      "wasFileOpen": false,
+      "firstGeneratedAt": 1791819948035,
+      "totalReviewTime": 0,
+      "modificationCount": 0,
+      "totalTimeInFocus": 0,
+      "scrollEventCount": 0,
+      "cursorMovementCount": 0,
+      "editsMade": false,
+      "reviewSessionsCount": 0,
+      "reviewedInTerminal": false
+    }
+  ],
+  "terminalReviewedFiles": [],
+  "agentSessions": [],
+  "workspace": {
+    "name": "Urban-Mobility-Explorer",
+    "path": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer",
+    "isMultiRoot": false
+  },
+  "coreMetrics": {
+    "authorship": {
+      "aiPercentage": 73.4192509061619,
+      "manualPercentage": 26.580749093838094,
+      "aiLines": 1823,
+      "manualLines": 660,
+      "status": "over-threshold",
+      "target": 40
+    },
+    "ownership": {
+      "score": 45,
+      "category": "light",
+      "unreviewedPercentage": 35,
+      "unreviewedLines": 2,
+      "filesNeedingReview": 5
+    },
+    "skillHealth": {
+      "status": "good",
+      "score": 85,
+      "aiBalanceScore": 100,
+      "reviewQualityScore": 70,
+      "consistencyScore": 86,
+      "trend": "improving",
+      "daysWithActivity": 6,
+      "extremeAIDays": 0,
+      "variance": 587
+    }
+  },
+  "assignment": null,
+  "fileTree": {
+    "name": "root",
+    "path": "",
+    "type": "directory",
+    "children": [
+      {
+        "name": "frontend",
+        "path": "frontend",
+        "type": "directory",
+        "children": [
+          {
+            "name": "js",
+            "path": "frontend/js",
+            "type": "directory",
+            "children": [
+              {
+                "name": "api.js",
+                "path": "frontend/js/api.js",
+                "type": "file",
+                "children": [],
+                "file": {
+                  "filePath": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer/frontend/js/api.js",
+                  "date": "2026-10-13",
+                  "tool": "ai",
+                  "reviewQuality": "none",
+                  "reviewScore": 0,
+                  "isReviewed": false,
+                  "linesGenerated": 2,
+                  "linesChanged": 2,
+                  "linesSinceReview": 2,
+                  "linesAdded": 2,
+                  "linesRemoved": 0,
+                  "charactersCount": 2704,
+                  "agentSessionId": "manual-session",
+                  "isAgentGenerated": true,
+                  "wasFileOpen": false,
+                  "firstGeneratedAt": 1791873965943,
+                  "totalReviewTime": 272080,
+                  "language": "javascript",
+                  "modificationCount": 2,
+                  "totalTimeInFocus": 272080,
+                  "scrollEventCount": 0,
+                  "cursorMovementCount": 0,
+                  "editsMade": false,
+                  "lastOpenedAt": 1791873965943,
+                  "reviewSessionsCount": 0,
+                  "reviewedInTerminal": false
+                },
+                "stats": {
+                  "filesChanged": 1,
+                  "filesReviewed": 0,
+                  "linesAdded": 2,
+                  "linesRemoved": 0
+                },
+                "isExpanded": false,
+                "depth": 3,
+                "status": "added"
+              }
+            ],
+            "stats": {
+              "filesChanged": 1,
+              "filesReviewed": 0,
+              "linesAdded": 2,
+              "linesRemoved": 0
+            },
+            "isExpanded": true,
+            "depth": 2
+          }
+        ],
+        "stats": {
+          "filesChanged": 1,
+          "filesReviewed": 0,
+          "linesAdded": 2,
+          "linesRemoved": 0
+        },
+        "isExpanded": true,
+        "depth": 1
+      },
+      {
+        "name": "README.md",
+        "path": "README.md",
+        "type": "file",
+        "children": [],
+        "file": {
+          "filePath": "/Users/nadivgicheru/Music/Logic/NADIFU/ALU/BSE/Y2/T1/enterprise-web-dev/summative/Urban-Mobility-Explorer/README.md",
+          "date": "2026-10-13",
+          "tool": "ai",
+          "reviewQuality": "thorough",
+          "reviewScore": 100,
+          "isReviewed": false,
+          "linesGenerated": 1148,
+          "linesChanged": 1824,
+          "linesSinceReview": 1461,
+          "linesAdded": 785,
+          "linesRemoved": 676,
+          "charactersCount": 65240,
+          "agentSessionId": "agent-session-1791918746806-cofl0x2z6",
+          "isAgentGenerated": true,
+          "wasFileOpen": false,
+          "firstGeneratedAt": 1791872401400,
+          "totalReviewTime": 90094,
+          "language": "markdown",
+          "modificationCount": 12,
+          "totalTimeInFocus": 867414,
+          "scrollEventCount": 1,
+          "cursorMovementCount": 0,
+          "editsMade": false,
+          "lastOpenedAt": 1791918744226,
+          "reviewSessionsCount": 0,
+          "reviewedInTerminal": false
+        },
+        "stats": {
+          "filesChanged": 1,
+          "filesReviewed": 0,
+          "linesAdded": 785,
+          "linesRemoved": 676
+        },
+        "isExpanded": false,
+        "depth": 1,
+        "status": "modified"
+      }
+    ],
+    "stats": {
+      "filesChanged": 2,
+      "filesReviewed": 0,
+      "linesAdded": 787,
+      "linesRemoved": 676
+    },
+    "isExpanded": true,
+    "depth": 0
+  },
+  "fileTreeStats": {
+    "totalFiles": 2,
+    "totalAdditions": 787,
+    "totalDeletions": 676,
+    "totalChanges": 1463,
+    "filesAdded": 1,
+    "filesModified": 1,
+    "filesDeleted": 0,
+    "reviewedFiles": 0,
+    "unreviewedFiles": 2,
+    "reviewProgress": 0
+  }
+}
