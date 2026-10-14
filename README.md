@@ -41,53 +41,119 @@ docs/       Data dictionary and documentation
 data/       Local datasets, exports, and audit outputs
 ```
 
-## Prerequisites
+## Prerequisites and terminal conventions
 
-- PostgreSQL running locally, with `psql` and `createdb` available.
-- Node.js with support for `--env-file-if-exists` (the project has been used with Node.js 24), and npm.
-- Python 3; processing libraries are needed only if rebuilding the datasets.
-- The data exports, or raw inputs needed to generate them. Large CSV and Parquet files are excluded from Git and shared separately.
-- Internet access for the Leaflet/Chart.js CDN scripts and OpenStreetMap tiles.
+Use **Terminal (bash/zsh) on macOS/Linux** or **PowerShell on Windows**. Commands marked “all platforms” work in either shell. Run each command separately and stop if it reports an error. Paths below are relative to the repository, not a particular team member's computer; quote any path containing spaces.
+
+Install these tools before starting:
+
+| Tool | macOS | Windows | Linux |
+| --- | --- | --- | --- |
+| Node.js and npm | Install Node.js 24 using the [official download instructions](https://nodejs.org/en/download). | Install Node.js 24 and reopen PowerShell afterward. | Install Node.js 24 using the official instructions for your distribution. |
+| PostgreSQL | Use the [PostgreSQL macOS options](https://www.postgresql.org/download/macosx/) and start the installed server. | Use the [Windows installer](https://www.postgresql.org/download/windows/); include command-line tools and remember the database password. | Follow the [PostgreSQL Linux instructions](https://www.postgresql.org/download/linux/) for your distribution and start its database service. |
+| Python 3 | Use an installed Python 3 or [python.org](https://www.python.org/downloads/). | Install Python 3 with the `py` launcher available. | Install Python 3, pip, and the venv package using your distribution's package manager. |
+
+Node.js must support `--env-file-if-exists`; this project has been used with Node.js 24. Python processing dependencies are only needed if rebuilding datasets. You also need the data exports (large files are shared separately), and internet access for Leaflet/Chart.js CDN scripts and OpenStreetMap tiles.
+
+Check your tools (all platforms):
+
+```text
+node --version
+npm --version
+psql --version
+createdb --version
+```
+
+Check Python with `python3 --version` on macOS/Linux or `py -3 --version` on Windows. If Windows has only `python`, verify that it is Python 3 and substitute `python` for `py -3` below.
+
+If `psql` or `createdb` is not found, add your PostgreSQL installation's `bin` directory to PATH and open a new terminal. On Windows it is commonly under `C:\Program Files\PostgreSQL\<installed-version>\bin`; replace the version placeholder with your actual installation. On macOS, follow the PATH instructions for your chosen PostgreSQL installer. Installing the client tools alone does not start a database server.
+
+If PowerShell reports that `npm.ps1` cannot run, use `npm.cmd` wherever these instructions say `npm`; changing the system execution policy is unnecessary.
 
 ## 1. Prepare the data
 
-Skip regeneration if you already have the required exports. The scripts expect the January taxi CSV, zone lookup CSV, and shapefile components under `data/raw/`.
+Start in the repository root, the folder containing `README.md`, `backend/`, `database/`, and `frontend/`. **Skip regeneration if you already have the required exports.** The scripts expect the January taxi CSV, zone lookup CSV, and shapefile components under `data/raw/`.
 
-Install processing dependencies:
+Create an isolated Python environment and install processing dependencies. These commands use its interpreter directly, so shell activation is not required. See the [Python venv documentation](https://docs.python.org/3/library/venv.html).
 
-```bash
-python3 -m pip install pandas pyarrow pyshp geopandas pyproj
-```
-
-Run from the repository root:
+**macOS/Linux:**
 
 ```bash
-python3 scripts/convert_to_parquet.py
-python3 scripts/clean_data.py
-python3 scripts/export_database_data.py
-python3 scripts/export_zones_geojson.py
+python3 -m venv .venv
+./.venv/bin/python -m pip install --upgrade pip
+./.venv/bin/python -m pip install pandas pyarrow pyshp geopandas pyproj
+./.venv/bin/python scripts/convert_to_parquet.py
+./.venv/bin/python scripts/clean_data.py
+./.venv/bin/python scripts/export_database_data.py
+./.venv/bin/python scripts/export_zones_geojson.py
 ```
+
+**Windows PowerShell:**
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install pandas pyarrow pyshp geopandas pyproj
+.\.venv\Scripts\python.exe scripts/convert_to_parquet.py
+.\.venv\Scripts\python.exe scripts/clean_data.py
+.\.venv\Scripts\python.exe scripts/export_database_data.py
+.\.venv\Scripts\python.exe scripts/export_zones_geojson.py
+```
+
+Keep `.venv/` out of Git; add it to your local `.git/info/exclude` if your Python version does not create an ignore file for it. If Linux reports that `venv` or `ensurepip` is unavailable, install the venv package matching your Python version, then retry environment creation. If a processing library has no compatible wheel, use a Python version supported by that library rather than assuming the newest Python release is supported.
 
 Outputs under `data/processed/` include `trips_full.csv`, `trips_sample.csv`, `zones.csv`, and `taxi_zones.geojson`. The 10,000-row sample contains the first records and is **not representative of the full month**.
 
-The frontend loads its boundaries from `frontend/assets/taxi_zones.geojson`. If you regenerate the geographic export, update that copy too:
+The frontend loads boundaries from `frontend/assets/taxi_zones.geojson`. After regenerating them, update that copy from the repository root:
+
+**macOS/Linux:**
 
 ```bash
 cp data/processed/taxi_zones.geojson frontend/assets/taxi_zones.geojson
 ```
 
+**Windows PowerShell:**
+
+```powershell
+Copy-Item data/processed/taxi_zones.geojson frontend/assets/taxi_zones.geojson
+```
+
 ## 2. Set up PostgreSQL
 
-The main setup uses the **full export**. On a new, empty database, run these commands from the repository root:
+Start PostgreSQL using the service/app installed on your operating system. Use an existing PostgreSQL login role that can create a database and owns the tables you will create. It may be your local username on macOS or a role created during installation, often `postgres` on Windows. PostgreSQL roles and operating-system usernames are not necessarily the same.
+
+On Linux installations using peer authentication, your administrator may need to create a password-enabled login role with database-creation permission first. The commands below use TCP (`127.0.0.1`) and the same login as the backend; do not assume `sudo -u postgres psql` credentials automatically apply to Node.js.
+
+Set connection defaults in your current terminal, replacing `your_database_role` with the real role name.
+
+**macOS/Linux:**
 
 ```bash
+export PGHOST=127.0.0.1
+export PGPORT=5432
+export PGUSER=your_database_role
+```
+
+**Windows PowerShell:**
+
+```powershell
+$env:PGHOST = "127.0.0.1"
+$env:PGPORT = "5432"
+$env:PGUSER = "your_database_role"
+```
+
+These settings apply to this terminal session. The client prompts for a password when required. Use your actual port if it differs from 5432. These PostgreSQL tools do **not** automatically read `backend/.env`.
+
+The main setup uses the **full export**. From the repository root, create a new, empty database (**all platforms**):
+
+```text
 createdb urban_mobility
 psql -d urban_mobility -v ON_ERROR_STOP=1 --single-transaction -f database/schema.sql
 ```
 
-The import script uses paths relative to `database/`, so run it from that directory:
+The import script uses paths relative to `database/`. Run the following on **all platforms**, keeping each command on one line:
 
-```bash
+```text
 cd database
 psql -d urban_mobility -v ON_ERROR_STOP=1 --single-transaction -f import.sql
 psql -d urban_mobility -v ON_ERROR_STOP=1 -f index.sql
@@ -95,51 +161,86 @@ psql -d urban_mobility -v ON_ERROR_STOP=1 -f validate.sql
 cd ..
 ```
 
-`import.sql` imports zones first, then the full trips export using explicit columns. `index.sql` creates pickup-hour and pickup-zone indexes and updates database statistics. Expected full-import counts are **265 zones and 7,667,792 trips**. Do not rerun schema creation or imports against populated tables.
+`import.sql` uses psql's `\copy` to read local files, imports zones before trips, and names the trip columns explicitly. Its forward-slash relative paths work on all three platforms; run it through `psql`, not a generic SQL query editor. `index.sql` creates indexes and updates database statistics. Expected full-import counts are **265 zones and 7,667,792 trips**. Do not rerun schema creation or imports against populated tables.
 
-For a small development database, use a separate empty database and substitute `trips_sample.csv` for `trips_full.csv` in a local copy of the import script. Expect 10,000 trips. The API's `data_mode` label is currently hardcoded to `database_full`; it does not detect sample imports automatically.
+For a small development database, use a separate empty database and substitute `trips_sample.csv` for `trips_full.csv` in a local copy of the import script. Expect 10,000 trips. The API's `data_mode` label is hardcoded to `database_full`; it does not detect sample imports automatically.
 
 ## 3. Run the backend
 
-From the repository root:
+From the repository root, on **all platforms**:
 
-```bash
+```text
 cd backend
 npm ci
+```
+
+If `.env` does not already exist, create it from the example. Do not overwrite an existing configured file.
+
+**macOS/Linux:**
+
+```bash
 cp .env.example .env
 ```
 
-Edit `backend/.env` for your local PostgreSQL installation:
+**Windows PowerShell:**
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `backend/.env` in your editor. It is a plain text configuration file with the **same syntax on all platforms**, not a shell script:
 
 ```dotenv
 PORT=3000
-PGHOST=localhost
+PGHOST=127.0.0.1
 PGPORT=5432
 PGDATABASE=urban_mobility
-PGUSER=your_local_postgres_user
+PGUSER=your_database_role
+PGPASSWORD="your_database_password"
 ```
 
-Set `PGPASSWORD` if required by your PostgreSQL authentication configuration; replace or remove the example password placeholder. Keep `.env` out of Git.
+Replace the role/password placeholders with the database credentials used above, or remove `PGPASSWORD` if your authentication setup does not require it. On Windows, ensure the filename is `.env`, not `.env.txt`. Keep `.env` out of Git. Existing environment variables take precedence over values in the file, so keep terminal connection settings consistent with it.
 
-Start the server and leave the terminal running:
+Start the server and leave this terminal running (**all platforms**):
 
-```bash
+```text
 npm start
 ```
 
-The start command loads `.env`. **Restart the backend after changing server code or the summary SQL**: the query file is read at startup. Control+C closes the HTTP server and database pool.
+In PowerShell, `npm.cmd start` is an alternative if the `npm.ps1` launcher is blocked. **Restart after changing server code or summary SQL**: the query is read at startup. Ctrl+C closes the server and database pool.
 
 ## 4. Run the frontend
 
-In a second terminal, from the repository root:
+Open a second terminal and navigate to the repository root again. No processing packages or virtual-environment activation are needed to serve the frontend.
+
+**macOS/Linux:**
 
 ```bash
 python3 -m http.server 5500 --bind 127.0.0.1
 ```
 
-Open [the local dashboard](http://127.0.0.1:5500/frontend/index.html). Serving the repository root with an editor's Live Server on the same address is another option; run only one server on port 5500.
+**Windows PowerShell:**
 
-The frontend API URL is currently `http://localhost:3000/api`, and the backend allows the frontend origin `http://127.0.0.1:5500`. If you change ports or deploy the project, update `frontend/js/api.js` and the CORS configuration in `backend/server.js`. Opening the HTML directly as a file is not the supported setup.
+```powershell
+py -3 -m http.server 5500 --bind 127.0.0.1
+```
+
+Open [the local dashboard](http://127.0.0.1:5500/frontend/index.html). Leave both terminals running. An editor's Live Server serving the repository root at the same address is another option; only one frontend server should use port 5500.
+
+Use the exact frontend address above: the backend permits origin `http://127.0.0.1:5500`, which differs from `http://localhost:5500`. The frontend API URL is `http://localhost:3000/api`. To change ports or deploy publicly, update `frontend/js/api.js` and CORS in `backend/server.js`. Opening HTML directly as a file is not supported.
+
+### Setup troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Command not found/not recognized | Install the tool, check PATH, and reopen the terminal. |
+| PostgreSQL connection refused | Start the database service and verify host/port. |
+| Password authentication failed or role does not exist | Use a real PostgreSQL role and matching credentials in both psql and `.env`. |
+| Permission denied creating the database | Use a role with `CREATEDB` permission or ask the database administrator to create a database owned by your role. |
+| CSV file not found | Confirm exports exist and run `import.sql` from `database/`. |
+| Address/port already in use | Stop the duplicate server or consistently update ports and CORS. |
+| API works but dashboard requests fail | Check the browser origin, API URL, and browser console. |
+| All Hours takes a while | It currently sends 24 requests; check the visible loading/error message before retrying. |
 
 ## API
 
@@ -205,22 +306,35 @@ The **frontend** first combines hourly pickup counts by `location_id`, then uses
 
 ## Verification
 
-From `backend/`:
+From `backend/` (all platforms):
 
-```bash
+```text
 node check_ranking.js
 node --env-file=.env check_db.js
 ```
 
 These scripts print ranking examples and database-query results for inspection; they are not a comprehensive automated test suite. `npm test` is still a placeholder that exits with an error.
 
-With the backend running:
+With the backend running, on **macOS/Linux**:
 
 ```bash
 curl 'http://localhost:3000/api/health'
 curl 'http://localhost:3000/api/zones/summary?pickup_hour=8'
 curl -i 'http://localhost:3000/api/zones/summary?pickup_hour=24'
 ```
+
+On **Windows PowerShell**, use `curl.exe` explicitly to avoid the `curl` alias in older PowerShell versions:
+
+```powershell
+curl.exe "http://localhost:3000/api/health"
+curl.exe "http://localhost:3000/api/zones/summary?pickup_hour=8"
+curl.exe -i "http://localhost:3000/api/zones/summary?pickup_hour=24"
+```
+
+The last request intentionally uses an invalid hour and should return HTTP 400. If `curl.exe` is unavailable, open the URLs in a browser or use `Invoke-RestMethod` for the successful requests.
+
+These instructions cover macOS, Windows, and Linux; the application checks described below were performed locally on macOS, not independently on all three operating systems.
+
 
 Earlier full-import validation matched **7,585,345 speed-eligible records** and **4,855,978 missing congestion surcharges**. East Village (location ID 79), hour 8, matched direct SQL: **5,992 pickups, 5,943 speed-eligible trips, and approximately 10.7353 mph**. The local dashboard also showed **7,667,255 January pickups** across All Hours; this differs from the source-row count because the source includes pickups outside January.
 
