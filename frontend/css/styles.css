@@ -179,7 +179,7 @@ hero-overlay{
     letter-spacing: 0.8px;
 }
 
-.filters select{
+.filters select, .filters input{
     width: 100%;
     padding: 11px;
     border: 1px solid var(--line);
@@ -189,8 +189,13 @@ hero-overlay{
     outline: none;
 }
 
-.filters select:focus{
+.filters select:focus, 
+.filters input:focus{
     border-color: var(--yellow);
+}
+
+.zone-search{
+    grid-column: 1 /-1;
 }
 
 .reset-button{

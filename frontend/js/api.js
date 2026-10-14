@@ -43,6 +43,7 @@ async function getZoneSummary(hour = "all") {
     const data = await response.json();
 
     return {
+        ...data, // NG - copy response's existing properties
         zones: data.zones.map(zone => ({
             ...zone,
             pickup_hour: Number(hour)

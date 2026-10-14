@@ -59,7 +59,19 @@ app.get("/api/zones/summary", async function (req, res){ //async allows handler 
             mean_trip_speed_mph:
                 row.mean_trip_speed_mph === null
                 ? null
-                :Number(row.mean_trip_speed_mph)
+                :Number(row.mean_trip_speed_mph),
+
+                eligible_fare_count: Number(row.eligible_fare_count),
+                mean_base_fare: 
+                    row.mean_base_fare === null
+                    ? null
+                    : Number(row.mean_base_fare), 
+
+                eligible_distance_count: Number(row.eligible_distance_count), 
+                mean_trip_distance: 
+                    row.mean_trip_distance === null
+                    ?null
+                    :Number(row.mean_trip_distance)
         };
     
     });
