@@ -280,7 +280,8 @@ hero-overlay{
 .map-card,
 .zone-card,
 .chart-card,
-.ranking-card{
+.ranking-card,
+.insight-chart-card{
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -435,7 +436,7 @@ hero-overlay{
 
 .section-title p{
     color: var(--yellow);
-    font-size: 40px;
+    font-size: 12px;
     font-weight: bold;
     letter-spacing: 2px;
     margin-bottom: 8px;
@@ -446,16 +447,16 @@ hero-overlay{
     letter-spacing: -1px;
 }
 
-.insight-card{
+.insights_grid{
     display: grid;
     grid-template-columns: repeat(2, minmax(280px, 420px));
     gap: 20px;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    margin-bottom: 25px;
 }
 .insight-card{
-    min-height: 50px;
-    padding: 10px;
+    min-height: 120px;
+    padding: 22px;
     background: rgb(36, 35, 35);
     border: 1px solid var(--line);
     border-radius: 10px;
@@ -473,6 +474,47 @@ hero-overlay{
     font-size: 14px;
 }
 
+.insight-charts{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 20px;
+    width: 100%;
+}
+.insight-chart-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.insight-chart-card{
+    width: 100%;
+}
+
+.insight-chart-card:nth-last-child(2),
+.insight-chart-card:last-child{
+    width: 100%;
+}
+
+.insight-chart-heading{
+    margin-bottom: 18px;
+}
+
+.insight-chart-heading h3{
+    color: var(--white);
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.insight-chart-heading p{
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.insight-chart-card canvas{
+    width: 100% !important;
+    max-height: 320px;
+}
 
 .about-section{
     padding-bottom: 50px;
@@ -589,6 +631,7 @@ hero-overlay{
     .about-grid{
         grid-template-columns: 1fr;
     }
+
 }
 
 @media (max-width: 550px) {
@@ -704,4 +747,65 @@ hero-overlay{
 }
 .footer-bottom p {
     font-size: 0.85rem;
+}
+
+.insight-grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.insight-card{
+    display: block;
+    width: 100%;
+    min-height: 120px;
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+.insight-charts{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.insight-chart-card{
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 24px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.insight-chart-heading{
+    margin-bottom: 18px;
+}
+
+.insight-chart-heading h3{
+    color: var(--white);
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.insight-chart-heading p{
+    color: var(--muted);
+    font-size: 13px;
+}
+.insight-chart-card canvas{
+    width: 100% !important;
+    max-height: 300px;
+}
+
+@media (max-width: 550px) {
+    .insight-grid,
+    .insight-charts{
+        grid-template-columns: 1fr;
+    }
 }

@@ -75,7 +75,7 @@ fetch("assets/taxi_zones.geojson")
 
                     const matchingZones = mapzoneData.filter(zone => {
 
-                        return String(zone.zone_id) === String(zoneId);
+                        return String(zone.location_id) === String(zoneId);
                     });
 
                     const pickupCount = matchingZones.reduce(
