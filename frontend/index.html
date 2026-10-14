@@ -231,12 +231,31 @@
                     <p id="fareInsight">Exploring distance and fare relationships.</p>
                 </div>
             </div>
+            <div class="insight-grid">
+                <div class="insight-chart-card">
+                    <div class="insight-chart-heading">
+                        <h3>Taxi Demand by Borough</h3>
+                        <p>Total pickups across NYC boroughs</p>
+                    </div>
+                    
+                    <canvas id="boroughChart"></canvas>
+                </div>
+
+                <div class="insight-chart-card">
+                    <div class="insight-chart-heading">
+                        <h3>Average Recorded Speed by Hour</h3>
+                        <p>How Taxi movement changes through the day</p>
+                    </div>
+                    
+                    <canvas id="speedChart"></canvas>
+                </div>
+            </div>
         </section>
 
         <section id="about" class="page-section about-section">
             <div class="section-title">
                 <p>ABOUT THE PROJECT</p>
-                <h2>About Urban Mobility Explorer</h2>
+                <h2>Understanding our cause, Urban Mobility Explorer</h2>
             </div>
 
             <div class="about-grid">
@@ -244,7 +263,7 @@
                     <h3>Project Purpose
                     </h3>
 
-                    <p>Urban Mobility Explorer uses NYC taxi trip data to explore how taxi activity, speed, distance and fares change across different times and locations. </p>
+                    <p>Urban Mobility Explorer turns NYC's famous Yellow Taxi trip data into an interactive <br>view of how taxi activity and movement vary across different locations and times. <br> Users can explore demand patterns, compare taxi zones, and <br> examine recorded speed across the city </p>
 
                 </div>
 
@@ -252,7 +271,7 @@
                     <h3>The Dataset</h3>
 
                     <p>
-                        The project uses January 2019 NYC Yellow Taxi records containing information about locations, times, distances, fares and recorded speeds.
+                        The project uses January 2019 NYC Yellow Taxi trip records from the NYC Taxi & Limousine Commission. <br> The Database includes pickup locations, pickup times, trip distances, fares, and other trip-level information <br> used to study urban mobility patterns.
                     </p>
                 </div>
 
@@ -265,7 +284,7 @@
                 <div class="about-card">
                     <h3>Key Limitation</h3>
 
-                    <p>Recorded taxi speed is an indicator of movement rather than a direct measurement of street congestion</p>
+                    <p>Recorded taxi speed is used as an indicator of movement, not a direct measure of road congestion. <br> The dataset also does not provide stable vehicle identifiers or complete routes, so empty travel between <br> passengers cannot be measured reliably.</p>
                 </div>
             </div>
         </section>
@@ -285,7 +304,7 @@
             </div>
 
             <div class="footer-bottom">
-                <p>© 2026 Group0 </p>
+                <p>© 2026 Group0 Summative Project </p>
                 <p>Bemigisha Bertha Mbonimpa <br> Kirabo Karyna Kiwagama <br> Nadiv Gicheru Razzaq</p>
             </div>
         </footer>

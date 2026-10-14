@@ -1,7 +1,8 @@
 let zoneData = [];
-let latestRequestId = 0;
-let dashboardState = "loading";
+let currentFilteredData = [];
 let hourlyChart = null;
+let boroughChart = null;
+let speedChart = null;
 
 const hourFilter = document.getElementById("hourFilter");
 const boroughFilter = document.getElementById("boroughFilter");
@@ -76,6 +77,11 @@ function updateDashboard(data) {
     updateRanking(filteredData);
     updateHourlyChart(filteredData);
     updateInsights(filteredData);
+    updateBoroughChart(filteredData);
+    updateSpeedChart(filteredData);
+
+    currentFilteredData = filteredData;
+    updateMapMetric(metricFilter.value, filteredData)
 }
 
 function updateInsights(data) {
@@ -455,110 +461,193 @@ function updateHourlyChart(data) {
     });
 }
 
+function updateBoroughChart(data) {
+    
+    const boroughTotals = {};
 
-function getPickupColor(count) {
-    if (count === 0) return "#737373";
-    if (count < 1000) return "#ffffb2";
-    if (count < 10000) return "#fecc5c";
-    if (count < 50000) return "#fd8d3c";
+    data.forEach(zone => {
 
-    return "#e31a1c";
-}
+        const borough = zone.borough || "Unknown";
+        const pickups = Number(zone.pickup_count || 0);
 
-function getSpeedColor(speed){
-    if (speed === null) return "#737373";
-    if (speed < 10) return "#ffffcc";
-    if (speed < 15) return "#a1dab4";
-    if (speed < 20) return "#41b6c4";
+        boroughTotals[borough] =
+            (boroughTotals[borough] || 0) + pickups;
+    });
 
-    return "#225ea8";
-}
+    const boroughs = [
+        "Manhattan",
+        "Brooklyn",
+        "Queens",
+        "Bronx",
+        "Staten Island"
+    ];
 
-function getFareColor(fare){
-    if (fare === null) return "#737373";
-    if (fare < 10) return "#eff3ff";
-    if (fare < 15) return "#bdd7e7";
-    if (fare < 20) return "#6baed6";
-    return "#2171b5";
-}
+    boroughs.sort((a,b) =>
+        (boroughTotals[b] || 0) - (boroughTotals[a] || 0)
+    );
 
+    const pickupTotals = boroughs.map(
+        borough => boroughTotals[borough]
+    );
 
-function updateMapLegend(metric){
-    const legend = document.getElementById("mapLegend");
+    const canvas = document.getElementById("boroughChart");
 
-    const legends = {
-        pickups: {
-            title: "Pickup count", 
-            items: [
-                [getPickupColor(0), "0"],
-                [getPickupColor(1), "1-999"],
-                [getPickupColor(1000), "1,000-9,999"],
-                [getPickupColor(10000), "10,000-49,999"],
-                [getPickupColor(50000), "50,000+"]
-            ]
+    if (!canvas) {
+        return;
+    }
+
+    if (boroughChart) {
+        boroughChart.destroy();
+    }
+
+    boroughChart = new Chart(canvas, {
+
+        type: "bar",
+
+        data: {
+            labels: boroughs,
+
+            datasets: [{
+                label: "Taxi Pickups",
+                data: pickupTotals,
+                borderWidth: 1
+            }]
         },
 
-        speed: {
-            title: "Average recorded speed (mph)",
-            items:[
-            [getSpeedColor(null), "No eligible speed data"],
-            [getSpeedColor(0), "Below 10"],
-            [getSpeedColor(10), "10 to below 15"],
-            [getSpeedColor(15), "15 to below 20"],
-            [getSpeedColor(20), "20+"]
-        ]
+        options: {
+            responsive: true,
 
-        },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
 
-        fare: {
-            title: "Average base fare per trip ($)", 
-            items: [
-                [getFareColor(null), "No eligible fare data"],
-                [getFareColor(0), "Below $10"],
-                [getFareColor(10), "$10 to below $15"],
-                [getFareColor(15), "$15 to below $20"],
-                [getFareColor(20), "$20+"]
-            ]
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
-    }   
-    const selectedLegend = legends[metric];
-
-    legend.innerHTML = `
-        <strong>${selectedLegend.title}</strong>
-        <div class="legend-items">
-            ${selectedLegend.items.map(([color, label]) =>`
-                <span class="legend-item">
-                    <span class="legend-swatch" style="background-color: ${color};"
-                    aria-hidden="true">
-                    </span>
-                    <span>${label}</span>
-                </span>
-            `).join("")}
-        </div>
-        <p>Faint zones are outside the current filters or lack eligible data.</p>    
-
-    `;
+    });
 }
 
-function updateMapMetric(metric) {
-    updateMapLegend(metric);
+function updateSpeedChart(data) {
 
-    const descriptions = {
-        pickups: "Pickup counts across matching taxi zones", 
-        speed: "Weighted average recorded speed by zone (mph)",
-        fare: "Weighted average base fare per trip by zone (USD)"
-    };
+    const hourlySpeeds = {};
+    const hourlyCounts = {};
 
-    document.getElementById("mapDescription").textContent = descriptions[metric];
+    data.forEach(zone => {
+
+        const hour = Number(zone.pickup_hour);
+        const speed = Number(zone.mean_trip_speed_mph);
+        const pickups = Number(zone.pickup_count || 0);
+
+        if (
+            hour >= 0 &&
+            hour <= 23 &&
+            !isNaN(speed) &&
+            speed > 0
+        ) {
+            hourlySpeeds[hour] =
+                (hourlySpeeds[hour] || 0) + (speed * pickups);
+
+            hourlyCounts[hour] =
+                (hourlyCounts[hour] || 0) + pickups;
+        }
+    });
+
+    const labels = [
+        "12 AM", "1 AM", "2 AM", "3 AM",
+        "4 AM", "5 AM", "6 AM", "7 AM",
+        "8 AM", "9 AM", "10 AM", "11 AM",
+        "12 PM", "1 PM", "2 PM", "3 PM",
+        "4 PM", "5 PM", "6 PM", "7 PM",
+        "8 PM", "9 PM", "10 PM", "11 PM"
+    ];
+
+    const speedValues = labels.map((_, hour) => {
+
+        if (!hourlyCounts[hour]) {
+            return null;
+        }
+
+        return (
+            hourlySpeeds[hour] /
+            hourlyCounts[hour]
+        ).toFixed(1);
+    });
+
+    const canvas = document.getElementById("speedChart");
+
+    if (!canvas) {
+        return;
+    }
+
+    if (speedChart) {
+        speedChart.destroy();
+    }
+
+    speedChart = new Chart(canvas, {
+
+        type: "line",
+
+        data: {
+            labels: labels,
+
+            datasets: [{
+                label: "Average Recorded Speed",
+                data: speedValues,
+                borderWidth: 3,
+                tension: 0.3,
+                fill: false,
+                spanGaps: true
+            }]
+        },
+
+        options: {
+            responsive: true,
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true,
+
+                    title: {
+                        display: true,
+                        text: "Speed (mph)"
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateMapMetric(metric, data = zoneData) {
 
     if (!window.taxiZoneLayer) {
         return;
     }
 
+    const values = [];
 
     window.taxiZoneLayer.eachLayer(layer => {
 
-        const zone = layer.feature.properties;
+        const properties = layer.feature.properties || {};
+
+        const zoneId =
+            properties.LocationID ||
+            properties.location_id ||
+            properties.zone_id;
+
+        const matchingZones = data.filter(zone =>
+            String(zone.location_id) === String(zoneId)
+        );
 
         const zoneId = 
             zone.LocationID ||
@@ -570,49 +659,62 @@ function updateMapMetric(metric) {
         let value = 0;
 
         if (metric === "pickups") {
-            value = matchingZones.reduce((total, record) => total + Number(record.pickup_count || 0),
-            0
-        );
-    }
 
-        if (metric === "speed"){
-            value = calculateMeanSpeed(matchingZones)
-        }
-        if (metric === "fare"){
-            value = calculateMeanFare(matchingZones);
-        }
+            value = matchingZones.reduce(
+                (total, zone) =>
+                    total + Number(zone.pickup_count || 0),
+                0
+            );
 
-        if (metric === "pickups"){
-            layer.setStyle({
-                fillColor: matchingZones.length
-                ? getPickupColor(value)
-                : "#737373",
-            fillOpacity: matchingZones.length ? 0.65 : 0.15
-            });
-        } else if (metric === "speed"){
-            layer.setStyle({
-                fillColor: getSpeedColor(value),
-                fillOpacity: matchingZones.length && value !== null ? 0.65 : 0.15
-            });
-        } else if (metric === "fare"){
-            layer.setStyle({
-                fillColor: getFareColor(value),
-                fillOpacity:
-                    matchingZones.length && value !== null ? 0.65 : 0.15
-            });
-        } else {
-            layer.setStyle({
-                fillColor: "#737373",
-                fillOpacity: 0.15
-            });
+        } else if (metric === "speed") {
+
+            const speeds = matchingZones
+                .map(zone => Number(zone.mean_trip_speed_mph))
+                .filter(speed => !isNaN(speed) && speed > 0);
+
+            value = speeds.length
+                ? speeds.reduce((a, b) => a + b, 0) / speeds.length
+                : 0;
+
+        } else if (metric === "fare") {
+
+            const fares = matchingZones
+                .map(zone => Number(zone.base_fare_per_mile))
+                .filter(fare => !isNaN(fare) && fare > 0);
+
+            value = fares.length
+                ? fares.reduce((a, b) => a + b, 0) / fares.length
+                : 0;
         }
 
+        values.push(value);
+        layer._metricValue = value;
+    });
+
+    const maxValue = Math.max(...values, 0);
+
+    window.taxiZoneLayer.eachLayer(layer => {
+
+        const value = layer._metricValue || 0;
+
+        const intensity = maxValue > 0
+            ? value / maxValue
+            : 0;
+
+        layer.setStyle({
+            fillColor: "#f4c430",
+            fillOpacity: value > 0
+                ? 0.15 + (intensity * 0.65)
+                : 0.10,
+            color: "#f4c430",
+            weight: 1
+        });
     });
 }
 hourFilter.addEventListener("change", loadDashboard);
 
 metricFilter.addEventListener("change", function() {
-    updateMapMetric(metricFilter.value);
+    updateMapMetric(metricFilter.value, currentFilteredData);
 });
 
 boroughFilter.addEventListener("change", function() {
@@ -630,8 +732,66 @@ resetFilters.addEventListener("click", function() {
 });
 
 searchInput.addEventListener("input", function() {
-    updateDashboard(zoneData);
+    const searchTerm = searchInput.value.toLowerCase().trim();
+
+    if (!searchTerm) {
+        updateDashboard(zoneData);
+        return;
+    }
+
+    const filteredData = zoneData.filter(zone =>
+        (zone.zone_name || "").toLowerCase().includes(searchTerm)
+    );
+
+    updateDashboard(filteredData);
+
+    if (window.taxiZoneLayer && filteredData.length > 0) {
+        const zoneName = filteredData[0].zone_name;
+
+        window.taxiZoneLayer.eachLayer(layer => {
+            const properties = layer.feature.properties || {};
+            const mapZoneName =
+                properties.zone_name ||
+                properties.zone ||
+                "";
+
+            if (mapZoneName.toLowerCase() === zoneName.toLowerCase()) {
+                taxiMap.fitBounds(layer.getBounds(), {
+                    padding: [30, 30]
+                });
+
+                layer.setStyle({
+                    fillOpacity: 0.6,
+                    weight: 3
+                });
+
+                setTimeout(() => {
+                    layer.setStyle({
+                        fillOpacity: 0.15,
+                        weight: 1
+                    });
+                }, 1500);
+            }
+        });
+    }
 });
+
+searchInput.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+
+        const map = document.getElementById("map");
+
+        if (map) {
+            const mapPosition = map.getBoundingClientRect().top + window.scrollY;
+
+            window.scrollTo({
+                top: mapPosition - 100,
+                behavior: "smooth"
+            });
+        }
+    }
+}); 
 
 sortFilter.addEventListener("change", function() {
     updateDashboard(zoneData);
