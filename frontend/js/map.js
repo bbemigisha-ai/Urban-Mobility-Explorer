@@ -133,42 +133,8 @@ fetch("assets/taxi_zones.geojson")
                     console.log("Selected zone:", zoneName);
                     console.log("Zone ID:", zoneId);
 
-                    const zoneDetails =
-                        document.getElementById("zoneDetails");
-
-                    const matchingZones = mapzoneData.filter(zone => {
-
-                        return String(zone.location_id) === String(zoneId);
-                    });
-
-                    const pickupCount = matchingZones.reduce(
-                        (total, zone) =>
-                            total + Number(zone.pickup_count || 0),
-                        0
-                    );
-
-                    const speeds = matchingZones
-                        .map(zone => Number(zone.mean_trip_speed_mph))
-                        .filter(speed => !isNaN(speed) && speed > 0);
-
-                    const averageSpeed = speeds.length
-                        ? speeds.reduce((a, b) => a + b, 0) / speeds.length
-                        : 0;
-
-                    zoneDetails.innerHTML = `
-                        <h2>${zoneName}</h2>
-                        <p>${borough}</p>
-
-                        <div class="zone-stat">
-                            <span>Pickups</span>
-                            <strong>${pickupCount.toLocaleString()}</strong>
-                        </div>
-
-                        <div class="zone-stat">
-                            <span>Average Speed</span>
-                            <strong>${averageSpeed.toFixed(1)} mph</strong>
-                        </div>
-                    `;
+                    selectedZone = {zoneId, zoneName, borough};
+                    displaySelectedZone(zoneId, zoneName, borough);
                 });
 
                     
