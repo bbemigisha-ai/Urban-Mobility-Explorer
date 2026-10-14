@@ -7,6 +7,9 @@ Urban Mobility Explorer is a student-built dashboard for **January 2019 NYC yell
 ## Task Sheet
 https://docs.google.com/spreadsheets/d/1EN5RWRRg64OWKpQUlkDSB9PPVTDlkKEdInlZfGUVCr4/edit?usp=sharing
 
+## Trello Board
+https://trello.com/invite/b/6ace63dde30372ef975b67e5/ATTI24f0788ad8967629801c5709ab0a4dd4E9A20AA2/summative-urban-mobility-explorer
+
 ## Current features
 
 - Processing of **7,667,792 source records**, with typed Parquet storage, derived features, quality-control flags, audit outputs, and database exports.
