@@ -4,6 +4,9 @@ Where do NYC taxi trips begin, how quickly do they move, and how does that chang
 
 Urban Mobility Explorer is a student-built dashboard for **January 2019 NYC yellow taxi records**. It connects a Python data-processing pipeline, PostgreSQL, an Express API, and a Leaflet dashboard.
 
+## Demo Video
+https://www.youtube.com/watch?v=kQfGzPce0o4
+
 ## Task Sheet
 https://docs.google.com/spreadsheets/d/1EN5RWRRg64OWKpQUlkDSB9PPVTDlkKEdInlZfGUVCr4/edit?usp=sharing
 
